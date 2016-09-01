@@ -49,7 +49,7 @@ This is an extension of the previous game. The logic is exactly the same, the
 differences only concern the display facilities.
 
 The interface is a window from the [GLUT
-toolkit](https://www.opengl.org/resources/libraries/glut/). The only part of
+toolkit](GLUT). The only part of
 the rendering in which OpenGL participates, however, is flushing the frame
 buffer onto the screen (see
 [glDrawPixels](https://www.opengl.org/sdk/docs/man2/xhtml/glDrawPixels.xml),
@@ -80,5 +80,63 @@ connecting the floor tiles that have been stepped upon an odd number of times.
 When the PC reaches the exit, the thread brightens up, while the labyrinth
 fades.
 
+### Top-down hack & slash
+
+This one extends the preceding game as well, but this time not only the display
+but the logic, too, is different.
+
+First and foremost, there are now a number of monsters present. Their
+appearance, behaviour, and difficulty varies. The proposed monster variations
+are:
+
+  * large, fat and slow, with heavy attacks and much health,
+  * skinny and tall, attacking from the distance, with little health,
+  * bulky and short, with medium attack strength and health,
+  * tiny flying orbs with as little health as possible, non-aggressive, but
+    healing other enemies from time to time.
+
+All of them are 3D models with the following animations:
+
+  * _Idle_: the monster stands, performing some idle motions;
+  * _Idle, walking_: the monster walks lo and fro;
+  * _Aggressive_: the monster has detected the PC and changes its position;
+  * _Charge_: the monster performs the primary battle motion;
+  * _Restore_: the monster suffers from the PC's attack.
+
+The PC is a 3D model as well, with animations:
+
+  * _Idle_: the PC stands;
+  * _Run_: the PC runs;
+  * _Attack_: the PC attacks (probably with three distinct animation
+    sequences);
+  * _Restore_: the PC was attacked by a monster.
+
+Each monster has a field of sight, and if the PC is in it, the monster is put
+into the aggressive mode and never returns to the idle mode.
+
+When murdered, monsters drop golden coins and healing potions. The PC must step
+on them in order to collect.
+
+The high score system is updated with the gold counter.
+
+A unit of space is defined to be the PC's height.
+
+The labyrinth is also 3D. Walls have torches attached to them every three
+units. The labyrinth is slightly more complex: in addition to corridors, now
+one unit wide, rooms are present, varying from 3 to 4 units, to 5 to 8 units.
+A room can have multiple exits. The requirement of the existence of the unique
+path from start to exit is weakened to the overall requirement of existence.
+
+The rooms are more likely to contain monsters than corridors.
+
+If, in order to display some segment of a floor tile, the camera must see
+through a wall, then the wall is displayed as a glowing outline of its borders.
+
+The rendering is performed via calls to [OpenGL][OpenGL]. The screen displays
+the field, health bar, gold counter and the timer described for the preceding
+milestones.
+
 [ncurses]: https://github.com/jeaye/ncurses-rs
+[GLUT]:    https://www.opengl.org/resources/libraries/glut/
+[OpenGL]:  https://www.opengl.org/ 
 
