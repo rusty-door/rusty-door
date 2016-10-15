@@ -1,7 +1,6 @@
 use std::time;
 
 use labyrinth;
-use screen;
 use menu;
 
 pub struct GameState {
@@ -40,7 +39,6 @@ impl Score {
 pub struct ProgramState {
     game : Option<GameState>,
     score : Score,
-    screen : Box<screen::Screen>,
     width : usize,
     height : usize
 }
@@ -49,7 +47,6 @@ impl ProgramState {
     pub fn new() -> ProgramState {
         ProgramState {
             game : None,
-            screen : Box::new(menu::MenuScreen::new()),
             score : Score::new(),
             width : 50,
             height : 30
