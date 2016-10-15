@@ -1,5 +1,19 @@
 use std::fmt;
 
+#[derive(Clone, Copy)]
+enum LeftRight {
+    Left = -1,
+    Middle = 0,
+    Right = 1,
+}
+
+#[derive(Clone, Copy)]
+enum UpDown {
+    Up = -1,
+    Middle = 0,
+    Down = 1,
+}
+
 pub struct Labyrinth {
     cells: Vec<Vec<bool>>
 }
@@ -37,6 +51,23 @@ impl Labyrinth {
         fill_labyrinth(&v);
         Labyrinth{cells : v}
     }
+
+    pub fn empty_neighbors(&self, i: usize, j: usize)
+        -> Vec<(LeftRight, UpDown)> {
+            let mut res = Vec::new();
+            let e = vec![true; self.cells[i].len()];
+            let lr = [LeftRight::Left, LeftRight::Middle, LeftRight::Right];
+            let ud = [UpDown::Up, UpDown::Middle, UpDown::Down];
+            for h in lr.iter() { for v in ud.iter() {
+                let hidx = (j as i32 + *h as i32) as usize;
+                let vidx = (i as i32 + *v as i32) as usize;
+                if *self.cells.
+                    get(hidx).unwrap_or(&e).get(vidx).unwrap_or(&true) {
+                        res.push((*h, *v));
+                    }
+            } }
+            res
+        }
 }
 
 pub struct Point {
