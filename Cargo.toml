@@ -5,4 +5,3 @@ authors = ["Dmitry Khalansky <rouanth@gmail.com>",
            "Evgeny Fomin <fominok@hotmail.com>"]
 
 [dependencies]
-time = "0.1"
