@@ -1,0 +1,8 @@
+[package]
+name = "rusty-door"
+version = "0.1.0"
+authors = ["Dmitry Khalansky <rouanth@gmail.com>",
+           "Evgeny Fomin <fominok@hotmail.com>"]
+
+[dependencies]
+time = "0.1"
