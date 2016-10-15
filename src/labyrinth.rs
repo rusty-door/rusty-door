@@ -4,7 +4,7 @@ pub struct Labyrinth {
     cells: Vec<Vec<bool>>
 }
 
-impl fmt::Display for Labyrinth {
+impl fmt::Debug for Labyrinth {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut v = Vec::new();
         for i in self.cells.iter() {
@@ -13,6 +13,21 @@ impl fmt::Display for Labyrinth {
             v.push(s);
         }
         write!(f, "{}", v.join("\n"))
+    }
+}
+
+impl fmt::Display for Labyrinth {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for i in 0..self.cells.len() {
+            let len = self.cells[i].len();
+            for j in 0..len {
+                try!(write!(f, "{}", if self.cells[i][j] {' '} else {'#'}));
+            }
+            if i != len - 1 {
+                try!(write!(f, "\n"));
+            }
+        }
+        Ok(())
     }
 }
 
