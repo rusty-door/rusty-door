@@ -4,9 +4,9 @@ use labyrinth;
 use menu;
 
 pub struct GameState {
-    field : labyrinth::Labyrinth,
-    player : labyrinth::Point,
-    playtime : time::Duration,
+    pub field : labyrinth::Labyrinth,
+    pub player : labyrinth::Point,
+    pub playtime : time::Duration,
 }
 
 impl GameState {
@@ -20,12 +20,12 @@ impl GameState {
 }
 
 pub struct ScoreEntry {
-    player : String,
-    score : u32
+    pub player : String,
+    pub score : u32
 }
 
 pub struct Score {
-    entries : Vec<ScoreEntry>
+    pub entries : Vec<ScoreEntry>
 }
 
 impl Score {
@@ -37,10 +37,10 @@ impl Score {
 }
 
 pub struct ProgramState {
-    game : Option<GameState>,
-    score : Score,
-    width : usize,
-    height : usize
+    pub game : Option<GameState>,
+    pub score : Score,
+    pub width : usize,
+    pub height : usize
 }
 
 impl ProgramState {
@@ -48,9 +48,13 @@ impl ProgramState {
         ProgramState {
             game : None,
             score : Score::new(),
-            width : 50,
+            width : 70,
             height : 30
         }
+    }
+
+    pub fn new_game(&mut self) {
+        self.game = Some(GameState::new(self.width, self.height))
     }
 }
 
