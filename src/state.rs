@@ -1,7 +1,6 @@
 use std::time;
 
 use labyrinth;
-use menu;
 
 pub struct GameState {
     pub field : labyrinth::Labyrinth,
