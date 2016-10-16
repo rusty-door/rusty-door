@@ -1,13 +1,13 @@
 use std::fmt;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum LeftRight {
     Left = -1,
     Middle = 0,
     Right = 1,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum UpDown {
     Up = -1,
     Middle = 0,
@@ -50,9 +50,44 @@ impl fmt::Display for Labyrinth {
 
 impl Labyrinth {
     pub fn new(width: usize, height: usize) -> Labyrinth {
-        let v = vec![vec![false; width]; height];
-        fill_labyrinth(&v);
-        Labyrinth{cells : v}
+        let mut v = Labyrinth{cells : vec![vec![true; width]; height]};
+        v.fill_labyrinth();
+        v
+    }
+
+    fn fill_labyrinth(&mut self) {
+        let mut visited =
+            vec![vec![false; self.cells[0].len()]; self.cells.len()];
+        let mut stack = vec![Point{x : 1, y : 1}];
+        'main: while let Some(f) = stack.pop() {
+            let Point{x, y} = f;
+            visited[x][y] = true;
+
+            if self.essential_cell(&f) {
+                continue;
+            }
+
+            self.cells[x][y] = false;
+
+            let good_neighbors = |m : &mut Vec<Point>, vidx, hidx, v, h| {
+                if v == UpDown::Middle || h == LeftRight::Middle {
+                    m.push(Point{x : vidx, y : hidx})
+                } };
+
+            Labyrinth::filter_around(&visited, true, false, &f, &mut stack,
+                                     good_neighbors);
+        }
+    }
+
+    fn essential_cell(&self, p: &Point) -> bool {
+        let en = self.empty_neighbors(&p);
+        let in_hdir = |dir, &Direction((hdir, _))| hdir == dir;
+        let in_vdir = |dir, &Direction((_, vdir))| vdir == dir;
+
+        en.iter().any(|x| in_hdir(LeftRight::Left, x)) &&
+            en.iter().any(|x| in_hdir(LeftRight::Right, x)) ||
+            en.iter().any(|x| in_vdir(UpDown::Up, x)) &&
+            en.iter().any(|x| in_vdir(UpDown::Down, x))
     }
 
     fn filter_around<T, F>(c: &Vec<Vec<bool>>, def: bool, req: bool, p: &Point,
@@ -82,8 +117,5 @@ impl Labyrinth {
 pub struct Point {
     pub x: usize,
     pub y: usize
-}
-
-pub fn fill_labyrinth(mut v: &Vec<Vec<bool>>) {
 }
 
