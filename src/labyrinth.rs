@@ -4,6 +4,7 @@ use direction::Direction;
 use std::fmt;
 use std::ops::Index;
 use std::ops::IndexMut;
+use std::collections::LinkedList;
 
 struct Field {
     cells: Vec<Vec<bool>>,
@@ -100,27 +101,57 @@ impl Labyrinth {
     }
 
     fn fill_labyrinth(&mut self) {
-        let mut visited = Field::new(
-            self.0.cells[0].len(), self.0.cells.len(), false);
-        let mut stack = vec![Point{x : 1, y : 1}];
-        let mut dir = Direction(LeftRight::Middle, UpDown::Down);
-        let mut walked = 0;
-        'main: while let Some(f) = stack.pop() {
-            let Point{x, y} = f;
-            visited[f.clone()] = true;
+        let mut visited = Field::new(self.0.width, self.0.height, false);
+        let mut stack = LinkedList::new();
+        stack.push_back(Point{x : 1, y : 1});
+        let mut dir = Direction(LeftRight::Middle, UpDown::Up);
+        let mut total = 0;
+        'main: while let Some(f) = stack.pop_front() {
+            let mut curr = f;
+            'run: loop {
+                if visited[curr] {
+                    continue 'main;
+                }
 
-            if self.essential_cell(&f) {
-                continue;
-            }
+                visited[curr] = true;
 
-            self.0.cells[x][y] = false;
+                if self.essential_cell(&curr) {
+                    continue 'main;
+                }
 
-            let good_neighbors = |m : &mut Vec<Point>, vidx, hidx, v, h| {
-                if v == UpDown::Middle || h == LeftRight::Middle {
-                    m.push(Point{x : vidx, y : hidx})
+                total = total + 1;
+                self.0[curr] = false;
+
+                let good_neighbors = |m : &mut LinkedList<Point>, vidx, hidx,
+                v, h| { if v == UpDown::Middle || h == LeftRight::Middle {
+                    m.push_back(Point{x : vidx, y : hidx})
                 } };
 
-            visited.filter_around(true, false, &f, &mut stack, good_neighbors);
+                visited.filter_around(true, false, &curr, &mut stack,
+                                      good_neighbors);
+
+                let rot_dir = |x: Direction| if total * 29 % 100 > 50 {
+                    x.rot_cw().rot_cw()
+                } else {
+                    x.rot_ctr_cw().rot_ctr_cw()
+                };
+
+                for _ in 0 .. total % 4 {
+                    dir = rot_dir(dir);
+                }
+
+                for _ in 0 .. 4 {
+                    let cp = curr.neighbor(dir);
+                    if *self.0.get(cp).unwrap_or(&false) &&
+                        ! visited[cp] && ! self.essential_cell(&cp) {
+                            curr = cp;
+                            continue 'run;
+                        } else {
+                            dir = rot_dir(dir);
+                        }
+                }
+                continue 'main;
+            }
         }
     }
 
@@ -129,10 +160,16 @@ impl Labyrinth {
         let in_hdir = |dir, &Direction(hdir, _)| hdir == dir;
         let in_vdir = |dir, &Direction(_, vdir)| vdir == dir;
 
-        en.iter().any(|x| in_hdir(LeftRight::Left, x)) &&
-            en.iter().any(|x| in_hdir(LeftRight::Right, x)) ||
-            en.iter().any(|x| in_vdir(UpDown::Up, x)) &&
-            en.iter().any(|x| in_vdir(UpDown::Down, x))
+        ! (en.iter().all(|x| in_hdir(LeftRight::Left, x)) ||
+           en.iter().all(|x| in_hdir(LeftRight::Right, x)) ||
+           en.iter().all(|x| in_vdir(UpDown::Up, x)) ||
+           en.iter().all(|x| in_vdir(UpDown::Down, x))) &&
+            (en.iter().any(|x| in_hdir(LeftRight::Left, x)) &&
+             en.iter().any(|x| in_hdir(LeftRight::Right, x)) ||
+             en.iter().any(|x| in_vdir(UpDown::Up, x)) &&
+             en.iter().any(|x| in_vdir(UpDown::Down, x)) ||
+             en.iter().any(|x| in_hdir(LeftRight::Middle, x)) &&
+             en.iter().any(|x| in_vdir(UpDown::Middle, x)))
     }
 
     fn empty_neighbors(&self, p: &Point) -> Vec<Direction> {
