@@ -32,9 +32,8 @@ impl Field {
             let ud = [UpDown::Up, UpDown::Middle, UpDown::Down];
             for h in lr.iter() { for v in ud.iter() {
                 let n = p.neighbor(Direction(*h, *v));
-                let Point{x, y} = n;
                 if req == *self.get(n).unwrap_or(&def) {
-                    f(t, x, y, *v, *h);
+                    f(t, n.x, n.y, *v, *h);
                 }
             } }
         }
@@ -188,11 +187,10 @@ pub struct Point {
 
 impl Point {
     fn neighbor(&self, d: Direction) -> Point {
-        let Point{x, y} = *self;
-        let Direction(h, v) = d;
-        let hidx = (y as i32 + h as i32) as usize;
-        let vidx = (x as i32 + v as i32) as usize;
-        Point{x: vidx, y: hidx}
+        Point{
+            x: (self.x as i32 + d.1 as i32) as usize,
+            y: (self.y as i32 + d.0 as i32) as usize
+        }
     }
 }
 

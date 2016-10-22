@@ -80,9 +80,9 @@ mod tests {
 
         let mut it = order.iter().peekable();
         while let Some(f) = it.next() {
-            if let Some(n) = it.peek() {
-                assert_eq!(f.rot_cw(), (*n).clone());
-                assert_eq!((*f).clone(), n.rot_ctr_cw());
+            if let Some(&n) = it.peek() {
+                assert_eq!(f.rot_cw(), *n);
+                assert_eq!(*f, n.rot_ctr_cw());
             }
         }
     }
