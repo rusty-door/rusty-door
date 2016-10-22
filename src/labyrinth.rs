@@ -1,21 +1,7 @@
+use direction::LeftRight;
+use direction::UpDown;
+use direction::Direction;
 use std::fmt;
-
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-enum LeftRight {
-    Left = -1,
-    Middle = 0,
-    Right = 1,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-enum UpDown {
-    Up = -1,
-    Middle = 0,
-    Down = 1,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-struct Direction((LeftRight, UpDown));
 
 pub struct Labyrinth {
     cells: Vec<Vec<bool>>
@@ -81,8 +67,8 @@ impl Labyrinth {
 
     fn essential_cell(&self, p: &Point) -> bool {
         let en = self.empty_neighbors(&p);
-        let in_hdir = |dir, &Direction((hdir, _))| hdir == dir;
-        let in_vdir = |dir, &Direction((_, vdir))| vdir == dir;
+        let in_hdir = |dir, &Direction(hdir, _)| hdir == dir;
+        let in_vdir = |dir, &Direction(_, vdir)| vdir == dir;
 
         en.iter().any(|x| in_hdir(LeftRight::Left, x)) &&
             en.iter().any(|x| in_hdir(LeftRight::Right, x)) ||
@@ -109,7 +95,7 @@ impl Labyrinth {
     fn empty_neighbors(&self, p: &Point) -> Vec<Direction> {
         let mut res = Vec::new();
         Labyrinth::filter_around(&self.cells, false, false, p, &mut res,
-                                 |m, _, _, v, h| m.push(Direction((h, v))));
+                                 |m, _, _, v, h| m.push(Direction(h, v)));
         res
     }
 }

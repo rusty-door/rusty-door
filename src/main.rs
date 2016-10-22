@@ -2,6 +2,7 @@ mod labyrinth;
 mod menu;
 mod screen;
 mod state;
+mod direction;
 
 fn main() {
     let mut pr = state::ProgramState::new();
