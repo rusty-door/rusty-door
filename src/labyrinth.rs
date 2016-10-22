@@ -21,14 +21,13 @@ impl Field {
     fn filter_around<T, F>(&self, def: bool, req: bool, p: &Point,
                            t: &mut T, mut f: F)
         where F: FnMut(&mut T, usize, usize, UpDown, LeftRight) {
-            let Point{x, y} = *p;
             let lr = [LeftRight::Left, LeftRight::Middle, LeftRight::Right];
             let ud = [UpDown::Up, UpDown::Middle, UpDown::Down];
             for h in lr.iter() { for v in ud.iter() {
-                let hidx = (y as i32 + *h as i32) as usize;
-                let vidx = (x as i32 + *v as i32) as usize;
-                if req == *self.get(Point{x: vidx, y: hidx}).unwrap_or(&def) {
-                    f(t, vidx, hidx, *v, *h);
+                let n = p.neighbor(Direction(*h, *v));
+                let Point{x, y} = n;
+                if req == *self.get(n).unwrap_or(&def) {
+                    f(t, x, y, *v, *h);
                 }
             } }
         }
@@ -143,5 +142,15 @@ impl Labyrinth {
 pub struct Point {
     pub x: usize,
     pub y: usize
+}
+
+impl Point {
+    fn neighbor(&self, d: Direction) -> Point {
+        let Point{x, y} = *self;
+        let Direction(h, v) = d;
+        let hidx = (y as i32 + h as i32) as usize;
+        let vidx = (x as i32 + v as i32) as usize;
+        Point{x: vidx, y: hidx}
+    }
 }
 
