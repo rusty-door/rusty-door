@@ -40,25 +40,21 @@ impl UpDown {
 pub struct Direction(pub LeftRight, pub UpDown);
 
 impl Direction {
+
+    fn rot_by(&self, re: i8, im: i8) -> Direction {
+        let Direction(x, y) = *self;
+        let (a, b) = (x as i8, y as i8);
+        Direction(
+            LeftRight::from_int(a * re - b * im),
+            UpDown::from_int(a * im - b * re))
+    }
+
     pub fn rot_cw(&self) -> Direction {
-        match self.0 {
-            LeftRight::Left => match self.1 {
-                UpDown::Up     => Direction(LeftRight::Middle, UpDown::Up),
-                UpDown::Middle => Direction(LeftRight::Left,   UpDown::Up),
-                UpDown::Down   => Direction(LeftRight::Left,   UpDown::Middle)
-            },
-            LeftRight::Middle => match self.1 {
-                UpDown::Up     => Direction(LeftRight::Right,  UpDown::Up),
-                UpDown::Middle => Direction(LeftRight::Middle, UpDown::Middle),
-                UpDown::Down   => Direction(LeftRight::Left,   UpDown::Down)
-            },
-            LeftRight::Right => match self.1 {
-                UpDown::Up     => Direction(LeftRight::Right,  UpDown::Middle),
-                UpDown::Middle => Direction(LeftRight::Right,  UpDown::Down),
-                UpDown::Down   => Direction(LeftRight::Middle, UpDown::Down)
-            }
-        }
+        self.rot_by(1, -1)
+    }
+
+    pub fn rot_ctr_cw(&self) -> Direction {
+        self.rot_by(1, 1)
     }
 }
-
 
