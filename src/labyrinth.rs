@@ -158,15 +158,16 @@ impl fmt::Display for Labyrinth {
 impl Labyrinth {
     pub fn new(width: usize, height: usize) -> Labyrinth {
         let mut v = Labyrinth(Field::new(width, height, true));
-        v.fill_labyrinth();
+        v.fill_labyrinth(0);
         v
     }
 
-    fn fill_labyrinth(&mut self) {
+    fn fill_labyrinth(&mut self, seed: u16) {
         let mut visited = Field::new(self.0.width, self.0.height, false);
         let mut stack = LinkedList::new();
         stack.push_back(Point{x : 1, y : 1});
         let mut dir = Direction(LeftRight::Middle, UpDown::Up);
+        let mut prng : u16 = 0;
         let mut total = 0;
         'main: while let Some(f) = stack.pop_front() {
             let mut curr = f;
@@ -192,15 +193,16 @@ impl Labyrinth {
                 visited.filter_around(true, false, &curr, &mut stack,
                                       good_neighbors);
 
-                let rot_dir = |x: Direction| if total * 29 % 100 > 50 {
-                    x.rot_cw().rot_cw()
-                } else {
-                    x.rot_ctr_cw().rot_ctr_cw()
-                };
+                let prng_in = (prng as u32 * 0x302 * (seed as u32 * 2 + 1))
+                    as u16;
+                let rot_dir = |x: Direction| if total * prng_in as u32
+                    % (1 << 16) > (1 << 15) { x.rot_cw().rot_cw() }
+                else { x.rot_ctr_cw().rot_ctr_cw() };
 
-                for _ in 0 .. total % 4 {
+                for _ in 0 .. total * ((prng_in as u32 % 2) * 2 + 1) % 4 {
                     dir = rot_dir(dir);
                 }
+                prng = prng + 1;
 
                 for _ in 0 .. 4 {
                     let cp = curr.neighbor(dir);
