@@ -37,6 +37,64 @@ impl Field {
                 }
             } }
         }
+
+    fn get_wall_character(&self, p: Point) -> char {
+        let Point{x: i, y: j} = p;
+        if ! self.cells[i][j] {
+            ' '
+        } else if j > 0 && *self.get(Point{x: i, y: j-1}).unwrap_or(&false) {
+            if i > 0 && *self.get(Point{x: i-1, y: j}).unwrap_or(&false) {
+                if *self.get(Point{x: i, y: j+1}).unwrap_or(&false) {
+                    if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
+                        0x6e as char
+                    } else {
+                        0x77 as char
+                    }
+                } else if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
+                    0x75 as char
+                } else {
+                    0x6B as char
+                }
+
+            } else if *self.get(Point{x: i, y: j+1}).unwrap_or(&false) {
+                if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
+                    0x76 as char
+                } else {
+                    0x71 as char
+                }
+            } else if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
+                0x6A as char
+            } else {
+                0x71 as char
+            }
+
+        } else {
+            if i > 0 && *self.get(Point{x: i-1, y: j}).unwrap_or(&false) {
+                if *self.get(Point{x: i, y: j+1}).unwrap_or(&false) {
+                    if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
+                        0x74 as char
+                    } else {
+                        0x6C as char
+                    }
+                } else if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
+                    0x78 as char
+                } else {
+                    0x78 as char
+                }
+
+            } else if *self.get(Point{x: i, y: j+1}).unwrap_or(&false) {
+                if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
+                    0x6D as char
+                } else {
+                    0x71 as char
+                }
+            } else if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
+                0x78 as char
+            } else {
+                '#'
+            }
+        }
+    }
 }
 
 impl Index<Point> for Field {
@@ -68,7 +126,8 @@ impl fmt::Display for Field {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for i in (0..self.height).rev() {
             for j in 0..self.width {
-                try!(write!(f, "{}", if self.cells[i][j] {'#'} else {' '}));
+                try!(write!(f, "\x1b(0{}\x1b(B", self.get_wall_character(
+                                    Point{x: i, y: j})));
             }
             if i != self.width - 1 {
                 try!(write!(f, "\n"));
