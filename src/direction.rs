@@ -26,9 +26,9 @@ pub enum UpDown {
 
 impl UpDown {
     fn from_int(i: i8) -> UpDown {
-        if i < 0 {
+        if i > 0 {
             UpDown::Up
-        } else if i > 0 {
+        } else if i < 0 {
             UpDown::Down
         } else {
             UpDown::Middle
@@ -46,7 +46,7 @@ impl Direction {
         let (a, b) = (x as i8, y as i8);
         Direction(
             LeftRight::from_int(a * re - b * im),
-            UpDown::from_int(a * im - b * re))
+            UpDown::from_int(a * im + b * re))
     }
 
     pub fn rot_cw(&self) -> Direction {
@@ -56,5 +56,36 @@ impl Direction {
     pub fn rot_ctr_cw(&self) -> Direction {
         self.rot_by(1, 1)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Direction;
+    use super::LeftRight;
+    use super::UpDown;
+
+    #[test]
+    fn rotation_test() {
+        let order = [
+            Direction(LeftRight::Left, UpDown::Up),
+            Direction(LeftRight::Middle, UpDown::Up),
+            Direction(LeftRight::Right, UpDown::Up),
+            Direction(LeftRight::Right, UpDown::Middle),
+            Direction(LeftRight::Right, UpDown::Down),
+            Direction(LeftRight::Middle, UpDown::Down),
+            Direction(LeftRight::Left, UpDown::Down),
+            Direction(LeftRight::Left, UpDown::Middle),
+            Direction(LeftRight::Left, UpDown::Up),
+        ];
+
+        let mut it = order.iter().peekable();
+        while let Some(f) = it.next() {
+            if let Some(n) = it.peek() {
+                assert_eq!(f.rot_cw(), (*n).clone());
+                assert_eq!((*f).clone(), n.rot_ctr_cw());
+            }
+        }
+    }
+
 }
 
