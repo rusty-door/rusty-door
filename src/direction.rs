@@ -19,9 +19,9 @@ impl LeftRight {
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum UpDown {
-    Up = -1,
+    Down = -1,
     Middle = 0,
-    Down = 1,
+    Up = 1,
 }
 
 impl UpDown {

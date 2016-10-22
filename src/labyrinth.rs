@@ -10,7 +10,7 @@ pub struct Labyrinth {
 impl fmt::Debug for Labyrinth {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut v = Vec::new();
-        for i in self.cells.iter() {
+        for i in self.cells.iter().rev() {
             let s : String = i.iter().map(
                 |&y| if y {'#'} else {' '}).collect();
             v.push(s);
@@ -21,7 +21,7 @@ impl fmt::Debug for Labyrinth {
 
 impl fmt::Display for Labyrinth {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for i in 0..self.cells.len() {
+        for i in (0..self.cells.len()).rev() {
             let len = self.cells[i].len();
             for j in 0..len {
                 try!(write!(f, "{}", if self.cells[i][j] {'#'} else {' '}));
