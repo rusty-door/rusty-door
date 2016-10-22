@@ -6,12 +6,18 @@ use std::ops::Index;
 use std::ops::IndexMut;
 
 struct Field {
-    cells: Vec<Vec<bool>>
+    cells: Vec<Vec<bool>>,
+    height: usize,
+    width: usize
 }
 
 impl Field {
     pub fn new(width: usize, height: usize, default: bool) -> Field {
-        Field { cells: vec![vec![default; width]; height] }
+        Field {
+            cells: vec![vec![default; width]; height],
+            height: height,
+            width: width,
+        }
     }
 
     fn get(&self, p: Point) -> Option<&bool> {
@@ -60,12 +66,11 @@ impl fmt::Debug for Field {
 
 impl fmt::Display for Field {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for i in (0..self.cells.len()).rev() {
-            let len = self.cells[i].len();
-            for j in 0..len {
+        for i in (0..self.height).rev() {
+            for j in 0..self.width {
                 try!(write!(f, "{}", if self.cells[i][j] {'#'} else {' '}));
             }
-            if i != len - 1 {
+            if i != self.width - 1 {
                 try!(write!(f, "\n"));
             }
         }
