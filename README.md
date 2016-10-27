@@ -1,6 +1,8 @@
 Rusty-door
 ==========
 
+![concept](/misc/concept.jpg?raw=true "Concept art")
+
 This is the course work in Computer Graphics. Its goal is a 3D dungeon crawler
 game.
 
