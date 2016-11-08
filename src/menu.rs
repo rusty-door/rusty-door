@@ -10,10 +10,10 @@ impl<'b> screen::Screen for MenuScreen<'b> {
         &'a mut screen::Screen {
             if let Some(i) = input {
                 match i {
-                    UserInput::Accept => (),
-                    UserInput::Cancel => (),
-                    UserInput::Direction(d) => (),
-                    UserInput::Menu => (),
+                    screen::UserInput::Accept => (),
+                    screen::UserInput::Cancel => (),
+                    screen::UserInput::Direction(d) => (),
+                    screen::UserInput::Menu => (),
                 }
             }
             self
