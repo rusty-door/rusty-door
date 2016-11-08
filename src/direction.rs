@@ -39,6 +39,9 @@ impl UpDown {
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Direction(pub LeftRight, pub UpDown);
 
+pub const DIR_UP:   Direction = Direction(LeftRight::Middle, UpDown::Up);
+pub const DIR_DOWN: Direction = Direction(LeftRight::Middle, UpDown::Down);
+
 impl Direction {
 
     fn rot_by(&self, re: i8, im: i8) -> Direction {
