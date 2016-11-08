@@ -6,24 +6,29 @@ pub struct MenuScreen<'b> {
 }
 
 impl<'b> screen::Screen for MenuScreen<'b> {
-    fn tick<'a>(&'a mut self, input: Option<screen::UserInput>) ->
-        &'a mut screen::Screen {
+    fn tick(&mut self, input: Option<screen::UserInput>) ->
+        Option<Box<screen::Screen>> {
             if let Some(i) = input {
                 match i {
-                    screen::UserInput::Accept => (),
+                    screen::UserInput::Accept => self.state.new_game(),
                     screen::UserInput::Cancel => (),
-                    screen::UserInput::Direction(d) => (),
-                    screen::UserInput::Menu => (),
+                    screen::UserInput::Direction(_) => (),
+                    screen::UserInput::Menu =>
+                      if let Some(ref f) = self.state.game {
+                          println!("{}", f.field);
+                      },
                 }
             }
-            self
+            None
         }
 
-    fn new<'a>(state: &'a mut state::ProgramState)
-        -> Box<screen::Screen + 'a> {
-            Box::new(MenuScreen {
-                state: state,
-            })
+}
+
+impl<'b> MenuScreen<'b> {
+    pub fn new<'a>(state: &'a mut state::ProgramState) -> MenuScreen<'a> {
+        MenuScreen {
+            state: state,
         }
+    }
 }
 

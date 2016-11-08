@@ -9,8 +9,6 @@ pub enum UserInput {
 }
 
 pub trait Screen {
-    fn tick<'a>(&'a mut self, Option<UserInput>) -> &'a mut Screen;
-    fn new<'a>(state: &'a mut state::ProgramState) -> Box<Screen + 'a>
-        where Self: Sized;
+    fn tick(&mut self, Option<UserInput>) -> Option<Box<Screen>>;
 }
 
