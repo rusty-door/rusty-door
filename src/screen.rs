@@ -1,6 +1,6 @@
 use direction;
-use state;
 
+#[derive (Clone, Copy)]
 pub enum UserInput {
     Accept,
     Cancel,
