@@ -54,11 +54,17 @@ const MENU_ITEMS: [Menu; 6] = [
 
 impl Menu {
     fn next(&self) -> Menu {
-        MENU_ITEMS[MENU_ITEMS.iter().position(|x| self.eq(x)).unwrap_or(0)]
+        MENU_ITEMS[self.position().unwrap_or(0) + 1
+            % MENU_ITEMS.len()]
     }
 
     fn prev(&self) -> Menu {
-        MENU_ITEMS[MENU_ITEMS.iter().rposition(|x| self.eq(x)).unwrap_or(0)]
+        MENU_ITEMS[self.position().unwrap_or(0) + MENU_ITEMS.len() - 1
+            % MENU_ITEMS.len()]
+    }
+
+    fn position(&self) -> Option<usize> {
+        MENU_ITEMS.iter().position(|x| self.eq(x))
     }
 }
 
