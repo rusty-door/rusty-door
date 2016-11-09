@@ -156,9 +156,9 @@ impl fmt::Display for Labyrinth {
 }
 
 impl Labyrinth {
-    pub fn new(width: usize, height: usize) -> Labyrinth {
+    pub fn new(width: usize, height: usize, seed: u16) -> Labyrinth {
         let mut v = Labyrinth(Field::new(width, height, true));
-        v.fill_labyrinth(0);
+        v.fill_labyrinth(seed);
         v
     }
 

@@ -11,6 +11,25 @@ pub struct MenuScreen<'b> {
 enum Options {
     Width,
     Height,
+    Seed,
+}
+
+const OPTION_ITEMS: [Options; 3] = [
+    Options::Width,
+    Options::Height,
+    Options::Seed,
+];
+
+impl Options {
+    fn next(&self) -> Options {
+        OPTION_ITEMS[OPTION_ITEMS.iter().position(
+            |x| self.eq(x)).unwrap_or(0)]
+    }
+
+    fn prev(&self) -> Options {
+        OPTION_ITEMS[OPTION_ITEMS.iter().rposition(
+            |x| self.eq(x)).unwrap_or(0)]
+    }
 }
 
 #[derive(PartialEq, Clone, Copy)]
@@ -65,7 +84,12 @@ impl<'b> screen::Screen for MenuScreen<'b> {
                         }
                     },
                     screen::UserInput::Direction(d) => {
-                        if let Menu::OptionsIn(_) = self.menu {
+                        if let Menu::OptionsIn(o) = self.menu {
+                            if d == direction::DIR_DOWN {
+                                self.menu = Menu::OptionsIn(o.next());
+                            } else if d == direction::DIR_UP {
+                                self.menu = Menu::OptionsIn(o.prev());
+                            }
                         } else {
                             if d == direction::DIR_DOWN {
                                 self.menu = self.menu.next();
