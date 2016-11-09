@@ -39,8 +39,11 @@ enum Menu {
     Options,
     OptionsIn(Options),
     HighScore,
+    HighScoreIn,
     License,
+    LicenseIn(u16),
     Quit,
+    QuitIn(usize, bool),
 }
 
 const MENU_ITEMS: [Menu; 6] = [
@@ -80,10 +83,29 @@ impl<'b> screen::Screen for MenuScreen<'b> {
                                 if let Some(ref f) = self.state.game {
                                     println!("{}", f.field);
                                 }
-                                None
+                                None // TODO: start game
+                            },
+                            Menu::Continue => {
+                                if let Some(ref f) = self.state.game {
+                                    println!("{}", f.field);
+                                }
+                                None // TODO: start game
                             },
                             Menu::Options => {
                                 self.menu = Menu::OptionsIn(Options::Width);
+                                None
+                            },
+                            Menu::HighScore => {
+                                self.menu = Menu::HighScoreIn;
+                                None
+                            },
+                            Menu::License => {
+                                self.menu = Menu::LicenseIn(0);
+                                None
+                            },
+                            Menu::Quit => {
+                                self.menu = Menu::QuitIn(
+                                    self.menu.position().unwrap_or(0), true);
                                 None
                             },
                             _ => None
@@ -95,7 +117,8 @@ impl<'b> screen::Screen for MenuScreen<'b> {
                                 self.menu = Menu::OptionsIn(o.next());
                             } else if d == direction::DIR_UP {
                                 self.menu = Menu::OptionsIn(o.prev());
-                            }
+                            } // TODO: change settings
+                        // TODO: navigate license and quitting dialogue
                         } else {
                             if d == direction::DIR_DOWN {
                                 self.menu = self.menu.next();
@@ -105,7 +128,22 @@ impl<'b> screen::Screen for MenuScreen<'b> {
                         }
                         None
                     },
-                    _ => None,
+                    screen::UserInput::Cancel => {
+                        if let Menu::OptionsIn(_) = self.menu {
+                            self.menu = Menu::Options;
+                        } else if let Menu::QuitIn(m, _) = self.menu {
+                            self.menu = MENU_ITEMS[m];
+                        } else if let Menu::LicenseIn(_) = self.menu {
+                            self.menu = Menu::License;
+                        } else if let Menu::HighScoreIn = self.menu {
+                            self.menu = Menu::HighScore;
+                        } else {
+                            self.menu = Menu::QuitIn(
+                                self.menu.position().unwrap_or(0), false);
+                        }
+                        None
+                    },
+                    _ => None
                 }
             } else {
                 None
