@@ -1,10 +1,19 @@
-use screen;
+use screen::{Screen,UserInput};
 use state;
 use direction;
 
 pub struct MenuScreen<'b> {
     state: &'b mut state::ProgramState,
-    menu: Menu,
+    subscreen: Subscreens,
+}
+
+#[derive(PartialEq, Clone, Copy)]
+enum Subscreens {
+    Menu(Menu),
+    Options(Options),
+    HighScore,
+    License(u8),
+    Quit(Menu, bool),
 }
 
 #[derive(PartialEq, Clone, Copy)]
@@ -37,13 +46,9 @@ enum Menu {
     NewGame,
     Continue,
     Options,
-    OptionsIn(Options),
     HighScore,
-    HighScoreIn,
     License,
-    LicenseIn(u16),
     Quit,
-    QuitIn(usize, bool),
 }
 
 const MENU_ITEMS: [Menu; 6] = [
@@ -71,84 +76,24 @@ impl Menu {
     }
 }
 
-impl<'b> screen::Screen for MenuScreen<'b> {
-    fn tick(&mut self, input: Option<screen::UserInput>) ->
-        Option<Box<screen::Screen>> {
-            if let Some(i) = input {
-                match i {
-                    screen::UserInput::Accept => {
-                        match self.menu {
-                            Menu::NewGame => {
-                                self.state.new_game();
-                                if let Some(ref f) = self.state.game {
-                                    println!("{}", f.field);
-                                }
-                                None // TODO: start game
-                            },
-                            Menu::Continue => {
-                                if let Some(ref f) = self.state.game {
-                                    println!("{}", f.field);
-                                }
-                                None // TODO: start game
-                            },
-                            Menu::Options => {
-                                self.menu = Menu::OptionsIn(Options::Width);
-                                None
-                            },
-                            Menu::HighScore => {
-                                self.menu = Menu::HighScoreIn;
-                                None
-                            },
-                            Menu::License => {
-                                self.menu = Menu::LicenseIn(0);
-                                None
-                            },
-                            Menu::Quit => {
-                                self.menu = Menu::QuitIn(
-                                    self.menu.position().unwrap_or(0), true);
-                                None
-                            },
-                            _ => None
-                        }
-                    },
-                    screen::UserInput::Direction(d) => {
-                        if let Menu::OptionsIn(o) = self.menu {
-                            if d == direction::DIR_DOWN {
-                                self.menu = Menu::OptionsIn(o.next());
-                            } else if d == direction::DIR_UP {
-                                self.menu = Menu::OptionsIn(o.prev());
-                            } // TODO: change settings
-                        // TODO: navigate license and quitting dialogue
-                        } else {
-                            if d == direction::DIR_DOWN {
-                                self.menu = self.menu.next();
-                            } else if d == direction::DIR_UP {
-                                self.menu = self.menu.prev();
-                            }
-                        }
-                        None
-                    },
-                    screen::UserInput::Cancel => {
-                        if let Menu::OptionsIn(_) = self.menu {
-                            self.menu = Menu::Options;
-                        } else if let Menu::QuitIn(m, _) = self.menu {
-                            self.menu = MENU_ITEMS[m];
-                        } else if let Menu::LicenseIn(_) = self.menu {
-                            self.menu = Menu::License;
-                        } else if let Menu::HighScoreIn = self.menu {
-                            self.menu = Menu::HighScore;
-                        } else {
-                            self.menu = Menu::QuitIn(
-                                self.menu.position().unwrap_or(0), false);
-                        }
-                        None
-                    },
-                    _ => None
-                }
-            } else {
-                None
+impl<'b> Screen for MenuScreen<'b> {
+
+    fn tick(&mut self, input: Option<UserInput>) -> Option<Box<Screen>> {
+        if let Some(i) = input {
+            match self.subscreen {
+                Subscreens::Menu(m) => {
+                    self.tick_menu(i, m)
+                },
+                Subscreens::Options(o) => {
+                    self.tick_opt(i, o);
+                    None
+                },
+                _ => None
             }
+        } else {
+            None
         }
+    }
 
 }
 
@@ -156,12 +101,82 @@ impl<'b> MenuScreen<'b> {
     pub fn new<'a>(state: &'a mut state::ProgramState) -> MenuScreen<'a> {
         MenuScreen {
             state: state,
-            menu: if let Some(_) = state.game {
-                Menu::Continue
-            } else {
-                Menu::NewGame
-            }
+            subscreen: Subscreens::Menu(
+                if let Some(_) = state.game {
+                    Menu::Continue
+                } else {
+                    Menu::NewGame
+                })
         }
     }
+
+    fn tick_menu(&mut self, input: UserInput, m: Menu) -> Option<Box<Screen>> {
+        match input {
+            UserInput::Accept => {
+                match m {
+                    Menu::NewGame => {
+                        self.state.new_game();
+                        if let Some(ref f) = self.state.game {
+                            println!("{}", f.field);
+                        }
+                        None // TODO: start game
+                    },
+                    Menu::Continue => {
+                        if let Some(ref f) = self.state.game {
+                            println!("{}", f.field);
+                        }
+                        None // TODO: start game
+                    },
+                    Menu::Options => {
+                        self.subscreen = Subscreens::Options(
+                            Options::Width);
+                        None
+                    },
+                    Menu::HighScore => {
+                        self.subscreen = Subscreens::HighScore;
+                        None
+                    },
+                    Menu::License => {
+                        self.subscreen = Subscreens::License(0);
+                        None
+                    },
+                    Menu::Quit => {
+                        self.subscreen = Subscreens::Quit(m, true);
+                        None
+                    },
+                }
+            },
+            UserInput::Direction(d) => {
+                if d == direction::DIR_DOWN {
+                    self.subscreen = Subscreens::Menu(m.next());
+                } else if d == direction::DIR_UP {
+                    self.subscreen = Subscreens::Menu(m.prev());
+                }
+                None
+            },
+            UserInput::Cancel => {
+                self.subscreen = Subscreens::Quit(m, false);
+                None
+            },
+            _ => None
+        }
+    }
+
+    fn tick_opt(&mut self, input: UserInput, o: Options) {
+            match input {
+                UserInput::Direction(d) => {
+                    if d == direction::DIR_DOWN {
+                        self.subscreen = Subscreens::Options(o.next());
+                    } else if d == direction::DIR_UP {
+                        self.subscreen = Subscreens::Options(o.prev());
+                    }
+                },
+                UserInput::Cancel => {
+                    self.subscreen = Subscreens::Menu(Menu::Options);
+                },
+                _ => ()
+            }
+
+        }
 }
 
