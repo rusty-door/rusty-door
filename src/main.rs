@@ -1,20 +1,20 @@
 mod labyrinth;
 mod menu;
-mod screen;
+mod tickable;
 mod state;
 mod direction;
+mod game;
 
-use screen::Screen;
-use screen::UserInput;
+use tickable::{Tickable, Input};
 
 fn main() {
     let mut pr = state::ProgramState::new();
-    let mut scr : Box<Screen> = Box::new(menu::MenuScreen::new(&mut pr));
-    for input in [UserInput::Accept,
-                  UserInput::Cancel,
-                  UserInput::Direction(direction::Direction(
+    let mut scr : Box<Tickable> = Box::new(menu::MenuScreen::new(&mut pr));
+    for input in [Input::Accept,
+                  Input::Cancel,
+                  Input::Direction(direction::Direction(
                       direction::LeftRight::Left, direction::UpDown::Up)),
-                  UserInput::Menu].iter() {
+                  Input::Menu].iter() {
             if let Some(f) = scr.tick(Some(*input)) {
                 scr = f;
             }

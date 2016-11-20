@@ -6,7 +6,7 @@ use std::ops::Index;
 use std::ops::IndexMut;
 use std::collections::LinkedList;
 
-struct Field {
+pub struct Field {
     cells: Vec<Vec<bool>>,
     height: usize,
     width: usize

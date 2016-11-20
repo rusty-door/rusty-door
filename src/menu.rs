@@ -1,4 +1,4 @@
-use screen::{Screen,UserInput};
+use tickable::{Tickable,Input};
 use state;
 use direction;
 
@@ -76,9 +76,9 @@ impl Menu {
     }
 }
 
-impl<'b> Screen for MenuScreen<'b> {
+impl<'b> Tickable for MenuScreen<'b> {
 
-    fn tick(&mut self, input: Option<UserInput>) -> Option<Box<Screen>> {
+    fn tick(&mut self, input: Option<Input>) -> Option<Box<Tickable>> {
         if let Some(i) = input {
             match self.subscreen {
                 Subscreens::Menu(m) => {
@@ -110,9 +110,9 @@ impl<'b> MenuScreen<'b> {
         }
     }
 
-    fn tick_menu(&mut self, input: UserInput, m: Menu) -> Option<Box<Screen>> {
+    fn tick_menu(&mut self, input: Input, m: Menu) -> Option<Box<Tickable>> {
         match input {
-            UserInput::Accept => {
+            Input::Accept => {
                 match m {
                     Menu::NewGame => {
                         self.state.new_game();
@@ -146,7 +146,7 @@ impl<'b> MenuScreen<'b> {
                     },
                 }
             },
-            UserInput::Direction(d) => {
+            Input::Direction(d) => {
                 if d == direction::DIR_DOWN {
                     self.subscreen = Subscreens::Menu(m.next());
                 } else if d == direction::DIR_UP {
@@ -154,7 +154,7 @@ impl<'b> MenuScreen<'b> {
                 }
                 None
             },
-            UserInput::Cancel => {
+            Input::Cancel => {
                 self.subscreen = Subscreens::Quit(m, false);
                 None
             },
@@ -162,16 +162,16 @@ impl<'b> MenuScreen<'b> {
         }
     }
 
-    fn tick_opt(&mut self, input: UserInput, o: Options) {
+    fn tick_opt(&mut self, input: Input, o: Options) {
             match input {
-                UserInput::Direction(d) => {
+                Input::Direction(d) => {
                     if d == direction::DIR_DOWN {
                         self.subscreen = Subscreens::Options(o.next());
                     } else if d == direction::DIR_UP {
                         self.subscreen = Subscreens::Options(o.prev());
                     }
                 },
-                UserInput::Cancel => {
+                Input::Cancel => {
                     self.subscreen = Subscreens::Menu(Menu::Options);
                 },
                 _ => ()

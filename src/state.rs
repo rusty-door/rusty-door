@@ -1,22 +1,4 @@
-use std::time;
-
-use labyrinth;
-
-pub struct GameState {
-    pub field : labyrinth::Labyrinth,
-    pub player : labyrinth::Point,
-    pub playtime : time::Duration,
-}
-
-impl GameState {
-    pub fn new(width : usize, height : usize, seed: u16) -> GameState {
-        GameState {
-            field : labyrinth::Labyrinth::new(width, height, seed),
-            player : labyrinth::Point { x : 0, y : 0 },
-            playtime : time::Duration::new(0, 0)
-        }
-    }
-}
+use game::Game;
 
 pub struct ScoreEntry {
     pub player : String,
@@ -36,7 +18,7 @@ impl Score {
 }
 
 pub struct ProgramState {
-    pub game : Option<GameState>,
+    pub game : Option<Game>,
     pub score : Score,
     pub width : usize,
     pub height : usize,
@@ -55,7 +37,7 @@ impl ProgramState {
     }
 
     pub fn new_game(&mut self) {
-        self.game = Some(GameState::new(self.width, self.height,
+        self.game = Some(Game::new(self.width, self.height,
                                         self.seed.unwrap_or(0)))
     }
 }
