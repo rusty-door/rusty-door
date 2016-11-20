@@ -1,5 +1,4 @@
 use tickable::{Tickable,Input};
-use direction;
 use labyrinth;
 use std::time;
 
@@ -24,7 +23,18 @@ impl Game {
 impl Tickable for Game {
 
     fn tick(&mut self, input: Option<Input>) -> Option<Box<Tickable>> {
-        None
+        self.playtime += time::Duration::new(1, 0);
+        match input {
+            Some(Input::Direction(d)) => {
+                let p = self.player.neighbor(d);
+                if let Some(&false) = self.field.0.get(p) {
+                    self.player = p;
+                }
+                None
+            },
+            _ => None,
+        }
     }
+
 }
 

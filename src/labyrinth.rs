@@ -21,11 +21,11 @@ impl Field {
         }
     }
 
-    fn get(&self, p: Point) -> Option<&bool> {
+    pub fn get(&self, p: Point) -> Option<&bool> {
         self.cells.get(p.x).and_then(|k| k.get(p.y))
     }
 
-    fn filter_around<T, F>(&self, def: bool, req: bool, p: &Point,
+    pub fn filter_around<T, F>(&self, def: bool, req: bool, p: &Point,
                            t: &mut T, mut f: F)
         where F: FnMut(&mut T, usize, usize, UpDown, LeftRight) {
             let lr = [LeftRight::Left, LeftRight::Middle, LeftRight::Right];
@@ -38,7 +38,7 @@ impl Field {
             } }
         }
 
-    fn get_wall_character(&self, p: Point) -> char {
+    pub fn get_wall_character(&self, p: Point) -> char {
         let Point{x: i, y: j} = p;
         if ! self.cells[i][j] {
             '.'
@@ -141,7 +141,7 @@ impl fmt::Display for Field {
     }
 }
 
-pub struct Labyrinth(Field);
+pub struct Labyrinth(pub Field);
 
 impl fmt::Debug for Labyrinth {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -251,7 +251,7 @@ pub struct Point {
 }
 
 impl Point {
-    fn neighbor(&self, d: Direction) -> Point {
+    pub fn neighbor(&self, d: Direction) -> Point {
         Point{
             x: (self.x as i32 + d.1 as i32) as usize,
             y: (self.y as i32 + d.0 as i32) as usize
