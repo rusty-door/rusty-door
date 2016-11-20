@@ -21,6 +21,14 @@ impl Field {
         }
     }
 
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    pub fn height(&self) -> usize {
+        self.height
+    }
+
     pub fn get(&self, p: Point) -> Option<&bool> {
         self.cells.get(p.x).and_then(|k| k.get(p.y))
     }
@@ -244,7 +252,7 @@ impl Labyrinth {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct Point {
     pub x: usize,
     pub y: usize
