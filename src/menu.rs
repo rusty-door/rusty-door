@@ -2,8 +2,8 @@ use tickable::{Tickable,Input};
 use state;
 use direction;
 
-pub struct MenuScreen<'b> {
-    state: &'b mut state::ProgramState,
+pub struct MenuScreen {
+    state: state::ProgramState,
     subscreen: Subscreens,
 }
 
@@ -76,7 +76,7 @@ impl Menu {
     }
 }
 
-impl<'b> Tickable for MenuScreen<'b> {
+impl Tickable for MenuScreen {
 
     fn tick(&mut self, input: Option<Input>) -> Option<Box<Tickable>> {
         if let Some(i) = input {
@@ -97,16 +97,16 @@ impl<'b> Tickable for MenuScreen<'b> {
 
 }
 
-impl<'b> MenuScreen<'b> {
-    pub fn new<'a>(state: &'a mut state::ProgramState) -> MenuScreen<'a> {
+impl MenuScreen {
+    pub fn new(state: state::ProgramState) -> MenuScreen {
         MenuScreen {
-            state: state,
             subscreen: Subscreens::Menu(
-                if let Some(_) = state.game {
+                if state.game.is_some() {
                     Menu::Continue
                 } else {
                     Menu::NewGame
-                })
+                }),
+            state: state,
         }
     }
 

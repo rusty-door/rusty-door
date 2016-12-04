@@ -8,8 +8,8 @@ mod game;
 use tickable::{Tickable, Input};
 
 fn main() {
-    let mut pr = state::ProgramState::new();
-    let mut scr : Box<Tickable> = Box::new(menu::MenuScreen::new(&mut pr));
+    let pr = state::ProgramState::new();
+    let mut scr : Box<Tickable> = Box::new(menu::MenuScreen::new(pr));
     for input in [Input::Accept,
                   Input::Cancel,
                   Input::Direction(direction::Direction(
