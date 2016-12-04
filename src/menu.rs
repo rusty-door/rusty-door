@@ -147,10 +147,20 @@ impl<'b> MenuScreen<'b> {
                 }
             },
             Input::Direction(d) => {
-                if d == direction::DIR_DOWN {
-                    self.subscreen = Subscreens::Menu(m.next());
-                } else if d == direction::DIR_UP {
-                    self.subscreen = Subscreens::Menu(m.prev());
+                let it = |m : Menu| {
+                    if d == direction::DIR_DOWN {
+                        m.next()
+                    } else if d == direction::DIR_UP {
+                        m.prev()
+                    } else {
+                        m
+                    }
+                };
+                self.subscreen = Subscreens::Menu(it(m));
+                if let Subscreens::Menu(Menu::Continue) = self.subscreen {
+                    if let None = self.state.game {
+                        self.subscreen = Subscreens::Menu(it(Menu::Continue));
+                    }
                 }
                 None
             },
