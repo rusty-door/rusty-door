@@ -1,4 +1,4 @@
-Rusty-door
+Rusty-door [![Build Status](https://travis-ci.org/rusty-door/rusty-door.svg?branch=master)](https://travis-ci.org/rusty-door/rusty-door)
 ==========
 
 ![concept](/misc/concept.jpg?raw=true "Concept art")
