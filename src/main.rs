@@ -5,6 +5,7 @@ mod state;
 mod direction;
 mod game;
 mod play;
+mod license;
 
 use tickable::{Tickable, Input};
 

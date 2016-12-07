@@ -1,6 +1,7 @@
 use tickable::{Tickable,Input};
 use state;
 use direction;
+use license;
 
 pub struct MenuScreen {
     state: state::ProgramState,
@@ -12,7 +13,7 @@ enum Subscreens {
     Menu(Menu),
     Options(Options),
     HighScore,
-    License(u8),
+    License(u16),
     Quit(Menu, bool),
 }
 
@@ -86,6 +87,10 @@ impl Tickable for MenuScreen {
                 },
                 Subscreens::Options(o) => {
                     self.tick_opt(i, o);
+                    None
+                },
+                Subscreens::License(line) => {
+                    self.tick_license(i, line);
                     None
                 },
                 _ => None
@@ -186,7 +191,27 @@ impl MenuScreen {
                 },
                 _ => ()
             }
-
         }
+
+    fn tick_license(&mut self, input: Input, line: u16) {
+        match input {
+            Input::Direction(d) => {
+                if d == direction::DIR_DOWN {
+                    self.subscreen = Subscreens::License(line + 1);
+                } else if d == direction::DIR_UP {
+                    self.subscreen = Subscreens::License(
+                        if line > 0 {
+                            line - 1
+                        } else {
+                            line
+                        });
+                }
+            },
+            Input::Cancel => {
+                self.subscreen = Subscreens::Menu(Menu::License);
+            },
+            _ => ()
+        }
+    }
 }
 
