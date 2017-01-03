@@ -1,10 +1,12 @@
 use game::Game;
 
+#[derive(Debug)]
 pub struct ScoreEntry {
     pub player : String,
     pub score : u32
 }
 
+#[derive(Debug)]
 pub struct Score {
     pub entries : Vec<ScoreEntry>
 }
@@ -17,6 +19,7 @@ impl Score {
     }
 }
 
+#[derive(Debug)]
 pub struct ProgramState {
     pub game : Option<Game>,
     pub score : Score,

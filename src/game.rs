@@ -1,12 +1,25 @@
 use tickable::{Tickable,Input};
 use labyrinth;
 use std::time;
+use std::fmt;
 
 pub struct Game {
     pub field : labyrinth::Labyrinth,
     pub player : labyrinth::Point,
     pub playtime : time::Duration,
     pub walked : labyrinth::Field,
+}
+
+impl fmt::Debug for Game {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let s = format!("{:?}", self.field);
+        let w = format!("{:?}", self.walked);
+        let r : String = s.chars().zip(w.chars()).map(
+                  |(x,y)| (x as u8 | y as u8) as char).collect();
+        write!(f, "{}\nTime: {:?}, player: {:?}\n", r,
+              self.playtime, self.player);
+        Ok(())
+    }
 }
 
 impl Game {

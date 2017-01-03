@@ -126,7 +126,7 @@ impl fmt::Debug for Field {
                 |&y| if y {'#'} else {' '}).collect();
             v.push(s);
         }
-        write!(f, "{}", v.join("\n"))
+        write!(f, "[\n{}\n]", v.join(",\n"))
     }
 }
 
@@ -252,7 +252,7 @@ impl Labyrinth {
     }
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub struct Point {
     pub x: usize,
     pub y: usize

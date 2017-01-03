@@ -6,12 +6,13 @@ use license;
 use play::PlayScreen;
 use std::mem;
 
+#[derive(Debug)]
 pub struct MenuScreen {
     state: ProgramState,
     subscreen: Subscreens,
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 enum Subscreens {
     Menu(Menu),
     Options(Options),
@@ -20,7 +21,7 @@ enum Subscreens {
     Quit(Menu, bool),
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 enum Options {
     Width,
     Height,
@@ -45,7 +46,7 @@ impl Options {
     }
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 enum Menu {
     NewGame,
     Continue,
@@ -124,17 +125,11 @@ impl MenuScreen {
                 match m {
                     Menu::NewGame => {
                         self.state.new_game();
-                        if let Some(ref f) = self.state.game {
-                            println!("{}", f.field);
-                        }
                         Some(Box::new(PlayScreen::new(mem::replace(
                             &mut self.state,
                             ProgramState::new()))))
                     },
                     Menu::Continue => {
-                        if let Some(ref f) = self.state.game {
-                            println!("{}", f.field);
-                        }
                         Some(Box::new(PlayScreen::new(mem::replace(
                             &mut self.state,
                             ProgramState::new()))))

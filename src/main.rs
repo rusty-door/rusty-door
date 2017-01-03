@@ -22,6 +22,7 @@ fn main() {
             if let Some(f) = scr.tick(Some(*input)) {
                 scr = f;
             }
+            println!("{:?}", scr);
     }
 }
 

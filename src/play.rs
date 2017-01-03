@@ -5,6 +5,7 @@ use state::ProgramState;
 use menu::MenuScreen;
 use std::mem;
 
+#[derive(Debug)]
 pub struct PlayScreen {
     state: ProgramState,
 }
