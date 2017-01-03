@@ -1,4 +1,6 @@
-use tickable::{Tickable,Input};
+use tickable::Input;
+use tickable::Tickable;
+use screen::Screen;
 use state::ProgramState;
 use menu::MenuScreen;
 use std::mem;
@@ -15,8 +17,8 @@ impl PlayScreen {
     }
 }
 
-impl Tickable for PlayScreen {
-    fn tick(&mut self, input: Option<Input>) -> Option<Box<Tickable>> {
+impl Screen for PlayScreen {
+    fn tick(&mut self, input: Option<Input>) -> Option<Box<Screen>> {
         match input {
             Some(Input::Menu) =>
                 Some(Box::new(MenuScreen::new(mem::replace(

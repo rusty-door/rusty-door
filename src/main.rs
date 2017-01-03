@@ -6,12 +6,14 @@ mod direction;
 mod game;
 mod play;
 mod license;
+mod screen;
 
-use tickable::{Tickable, Input};
+use tickable::Input;
+use screen::Screen;
 
 fn main() {
     let pr = state::ProgramState::new();
-    let mut scr : Box<Tickable> = Box::new(menu::MenuScreen::new(pr));
+    let mut scr : Box<Screen> = Box::new(menu::MenuScreen::new(pr));
     for input in [Input::Accept,
                   Input::Cancel,
                   Input::Direction(direction::Direction(

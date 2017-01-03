@@ -1,10 +1,13 @@
-use tickable::{Tickable,Input};
-use state;
+use tickable::Input;
+use screen::Screen;
+use state::ProgramState;
 use direction;
 use license;
+use play::PlayScreen;
+use std::mem;
 
 pub struct MenuScreen {
-    state: state::ProgramState,
+    state: ProgramState,
     subscreen: Subscreens,
 }
 
@@ -77,9 +80,9 @@ impl Menu {
     }
 }
 
-impl Tickable for MenuScreen {
+impl Screen for MenuScreen {
 
-    fn tick(&mut self, input: Option<Input>) -> Option<Box<Tickable>> {
+    fn tick(&mut self, input: Option<Input>) -> Option<Box<Screen>> {
         if let Some(i) = input {
             match self.subscreen {
                 Subscreens::Menu(m) => {
@@ -103,7 +106,7 @@ impl Tickable for MenuScreen {
 }
 
 impl MenuScreen {
-    pub fn new(state: state::ProgramState) -> MenuScreen {
+    pub fn new(state: ProgramState) -> MenuScreen {
         MenuScreen {
             subscreen: Subscreens::Menu(
                 if state.game.is_some() {
@@ -115,7 +118,7 @@ impl MenuScreen {
         }
     }
 
-    fn tick_menu(&mut self, input: Input, m: Menu) -> Option<Box<Tickable>> {
+    fn tick_menu(&mut self, input: Input, m: Menu) -> Option<Box<Screen>> {
         match input {
             Input::Accept => {
                 match m {
@@ -124,13 +127,17 @@ impl MenuScreen {
                         if let Some(ref f) = self.state.game {
                             println!("{}", f.field);
                         }
-                        None // TODO: start game
+                        Some(Box::new(PlayScreen::new(mem::replace(
+                            &mut self.state,
+                            ProgramState::new()))))
                     },
                     Menu::Continue => {
                         if let Some(ref f) = self.state.game {
                             println!("{}", f.field);
                         }
-                        None // TODO: start game
+                        Some(Box::new(PlayScreen::new(mem::replace(
+                            &mut self.state,
+                            ProgramState::new()))))
                     },
                     Menu::Options => {
                         self.subscreen = Subscreens::Options(
