@@ -50,56 +50,25 @@ impl Field {
         let Point{x: i, y: j} = p;
         if ! self.cells[i][j] {
             '.'
-        } else if j > 0 && *self.get(Point{x: i, y: j-1}).unwrap_or(&false) {
-            if i > 0 && *self.get(Point{x: i-1, y: j}).unwrap_or(&false) {
-                if *self.get(Point{x: i, y: j+1}).unwrap_or(&false) {
-                    if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
-                        0x6e as char
-                    } else {
-                        0x77 as char
-                    }
-                } else if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
-                    0x75 as char
-                } else {
-                    0x6B as char
-                }
-
-            } else if *self.get(Point{x: i, y: j+1}).unwrap_or(&false) {
-                if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
-                    0x76 as char
-                } else {
-                    0x71 as char
-                }
-            } else if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
-                0x6A as char
-            } else {
-                0x71 as char
-            }
-
         } else {
-            if i > 0 && *self.get(Point{x: i-1, y: j}).unwrap_or(&false) {
-                if *self.get(Point{x: i, y: j+1}).unwrap_or(&false) {
-                    if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
-                        0x74 as char
-                    } else {
-                        0x6C as char
-                    }
-                } else if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
-                    0x78 as char
-                } else {
-                    0x78 as char
-                }
-
-            } else if *self.get(Point{x: i, y: j+1}).unwrap_or(&false) {
-                if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
-                    0x6D as char
-                } else {
-                    0x71 as char
-                }
-            } else if *self.get(Point{x: i+1, y: j}).unwrap_or(&false) {
-                0x78 as char
-            } else {
-                '#'
+            let getter = |x, y| *self.get(Point{x:x, y:y}).unwrap_or(&false);
+            match 8 * (if j > 0 { getter(i,   j-1) as u8 } else { 0 } ) +
+                  4 * (getter(i,   j+1) as u8) +
+                  2 * (if i > 0 { getter(i-1, j  ) as u8 } else { 0 } ) +
+                  1 * (getter(i+1, j  ) as u8) {
+                0x0 => '#',
+                0x9 => 0x6A as char,
+                0xA => 0x6B as char,
+                0x6 => 0x6C as char,
+                0x5 => 0x6D as char,
+                0xF => 0x6E as char,
+                0x7 => 0x74 as char,
+                0xB => 0x75 as char,
+                0xD => 0x76 as char,
+                0xE => 0x77 as char,
+                0x1 | 0x2 | 0x3 => 0x78 as char,
+                0x4 | 0x8 | 0xC => 0x71 as char,
+                _   => ' '
             }
         }
     }

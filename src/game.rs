@@ -16,8 +16,8 @@ impl fmt::Debug for Game {
         let w = format!("{:?}", self.walked);
         let r : String = s.chars().zip(w.chars()).map(
                   |(x,y)| (x as u8 | y as u8) as char).collect();
-        write!(f, "{}\nTime: {:?}, player: {:?}\n", r,
-              self.playtime, self.player);
+        try!(write!(f, "{}\nTime: {:?}, player: {:?}\n", r,
+              self.playtime, self.player));
         Ok(())
     }
 }
