@@ -12,10 +12,17 @@ pub struct Game {
 
 impl fmt::Debug for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let s = format!("{:?}", self.field);
-        let w = format!("{:?}", self.walked);
-        let r : String = s.chars().zip(w.chars()).map(
-                  |(x,y)| (x as u8 | y as u8) as char).collect();
+        let mut p = labyrinth::Field::new(self.walked.width(),
+                                          self.walked.height(), false);
+        p[self.player] = true;
+        let s : String = format!("{:?}", self.field);
+        let w : String = format!("{:?}", self.walked);
+        let z : String = format!("{:?}", p);
+        let r : String = s.chars().zip(w.chars()).zip(z.chars()).map(
+                  |((x,y),z)| (x as u8 |
+                               if y == '#' { '.' } else { y } as u8 |
+                               if z == '#' { 'o' } else { z } as u8)
+                               as char).collect();
         try!(write!(f, "{}\nTime: {:?}, player: {:?}\n", r,
               self.playtime, self.player));
         Ok(())
