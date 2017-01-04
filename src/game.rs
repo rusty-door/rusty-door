@@ -50,11 +50,13 @@ impl Game {
 impl Tickable for Game {
 
     fn tick(&mut self, input: Option<Input>) -> Option<Box<Tickable>> {
+        self.walked[self.player] = true;
         self.playtime += time::Duration::new(1, 0);
         match input {
             Some(Input::Direction(d)) => {
                 let p = self.player.neighbor(d);
                 if let Some(&false) = self.field.0.get(p) {
+                    self.walked[self.player] = !self.walked[p];
                     self.player = p;
                 }
             },
