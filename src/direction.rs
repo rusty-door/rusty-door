@@ -39,8 +39,10 @@ impl UpDown {
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Direction(pub LeftRight, pub UpDown);
 
-pub const DIR_UP:   Direction = Direction(LeftRight::Middle, UpDown::Up);
-pub const DIR_DOWN: Direction = Direction(LeftRight::Middle, UpDown::Down);
+pub const DIR_UP:    Direction = Direction(LeftRight::Middle, UpDown::Up);
+pub const DIR_DOWN:  Direction = Direction(LeftRight::Middle, UpDown::Down);
+pub const DIR_LEFT:  Direction = Direction(LeftRight::Left,   UpDown::Middle);
+pub const DIR_RIGHT: Direction = Direction(LeftRight::Right,  UpDown::Middle);
 
 impl Direction {
 
