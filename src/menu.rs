@@ -197,6 +197,28 @@ impl MenuScreen {
                         self.subscreen = Subscreens::Options(o.next());
                     } else if d == direction::DIR_UP {
                         self.subscreen = Subscreens::Options(o.prev());
+                    } else if d == direction::DIR_LEFT {
+                        match o {
+                            Options::Width =>
+                                self.state.width  = self.state.width  - 1,
+                            Options::Height =>
+                                self.state.height = self.state.height - 1,
+                            Options::Seed => {
+                                self.state.seed =
+                                    self.state.seed.map(|x| x - 1)
+                            }
+                        }
+                    } else if d == direction::DIR_RIGHT {
+                        match o {
+                            Options::Width =>
+                                self.state.width  = self.state.width  + 1,
+                            Options::Height =>
+                                self.state.height = self.state.height + 1,
+                            Options::Seed => {
+                                self.state.seed =
+                                    self.state.seed.map(|x| x + 1)
+                            }
+                        }
                     }
                 },
                 Input::Cancel => {
