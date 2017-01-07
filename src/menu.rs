@@ -4,6 +4,7 @@ use state::ProgramState;
 use direction;
 use license;
 use play::PlayScreen;
+use geometry;
 use std::mem;
 
 #[derive(Debug)]
@@ -82,6 +83,15 @@ impl Menu {
 
     fn position(&self) -> Option<usize> {
         MENU_ITEMS.iter().position(|x| self.eq(x))
+    }
+}
+
+impl geometry::Worldly for MenuScreen {
+    fn scene(&self) -> geometry::World {
+        geometry::World {
+            polygons : vec!(),
+            lighting : vec!()
+        }
     }
 }
 

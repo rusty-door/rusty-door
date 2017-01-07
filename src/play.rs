@@ -3,6 +3,7 @@ use tickable::Tickable;
 use screen::Screen;
 use state::ProgramState;
 use menu::MenuScreen;
+use geometry;
 use std::mem;
 
 #[derive(Debug)]
@@ -14,6 +15,15 @@ impl PlayScreen {
     pub fn new(state: ProgramState) -> PlayScreen {
         PlayScreen {
             state: state,
+        }
+    }
+}
+
+impl geometry::Worldly for PlayScreen {
+    fn scene(&self) -> geometry::World {
+        geometry::World {
+            polygons : vec!(),
+            lighting : vec!()
         }
     }
 }

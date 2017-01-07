@@ -7,6 +7,7 @@ mod game;
 mod play;
 mod license;
 mod screen;
+mod geometry;
 
 use tickable::Input;
 use screen::Screen;
