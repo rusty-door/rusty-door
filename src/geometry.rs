@@ -1,7 +1,7 @@
 use std::ops::Index;
 use std::convert::From;
 
-pub struct Color (u8, u8, u8);
+pub struct RGB (pub u8, pub u8, pub u8);
 
 pub struct Angle (f64);
 
@@ -47,7 +47,7 @@ pub struct Axis  (Dimension);
 pub struct Plane (Dimension);
 
 #[derive(Copy,Clone)]
-pub struct Coord3D (i32, i32, i32);
+pub struct Coord3D (pub i32, pub i32, pub i32);
 
 impl Index<Axis> for Coord3D {
     type Output = i32;
@@ -74,18 +74,24 @@ impl Coord3D {
     }
 }
 
-pub enum PolyColor {
-    Const(Color),
-    Gradient(Color, Color, Color),
+pub enum Primitive {
+    TriangleList,
+    TriangleStrip
 }
 
-pub struct Polygon {
-    pub coords: [Coord3D; 3],
-    pub color:  PolyColor,
+pub enum ShapeColor {
+    Const(RGB),
+    Gradient(RGB, RGB, RGB),
+}
+
+pub struct Shape {
+    pub coords: Vec<Coord3D>,
+    pub primitive: Primitive,
+    pub color:  ShapeColor,
 }
 
 pub struct World {
-    pub polygons: Vec<Polygon>,
+    pub shapes: Vec<Shape>,
     pub lighting: Vec<Coord3D>,
 }
 

@@ -89,7 +89,7 @@ impl Menu {
 impl geometry::Worldly for MenuScreen {
     fn scene(&self) -> geometry::World {
         geometry::World {
-            polygons : vec!(),
+            shapes   : vec!(),
             lighting : vec!()
         }
     }
