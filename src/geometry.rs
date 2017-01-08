@@ -1,6 +1,7 @@
 use std::ops::Index;
 use std::convert::From;
 
+#[derive(Clone, Copy)]
 pub struct RGB (pub u8, pub u8, pub u8);
 
 pub struct Angle (f64);
@@ -79,14 +80,28 @@ pub enum Primitive {
     TriangleStrip
 }
 
+#[derive(Clone, Copy)]
 pub struct Vertex {
     pub coords: Coord3D,
     pub color: RGB,
 }
 
+pub struct Polygon ([Vertex; 3]);
+
 pub struct Shape {
     pub verts: Vec<Vertex>,
     pub primitive: Primitive,
+}
+
+impl Into<Vec<Polygon>> for Shape {
+    fn into(self: Shape) -> Vec<Polygon> {
+        match self.primitive {
+            Primitive::TriangleList =>  self.verts.chunks (3).map(|x|
+                                 Polygon([x[0], x[1], x[2]])).collect(),
+            Primitive::TriangleStrip => self.verts.windows(3).map(|x|
+                                 Polygon([x[0], x[1], x[2]])).collect()
+        }
+    }
 }
 
 pub struct World {
