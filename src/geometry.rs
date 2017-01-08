@@ -79,15 +79,14 @@ pub enum Primitive {
     TriangleStrip
 }
 
-pub enum ShapeColor {
-    Const(RGB),
-    Gradient(RGB, RGB, RGB),
+pub struct Vertex {
+    pub coords: Coord3D,
+    pub color: RGB,
 }
 
 pub struct Shape {
-    pub coords: Vec<Coord3D>,
+    pub verts: Vec<Vertex>,
     pub primitive: Primitive,
-    pub color:  ShapeColor,
 }
 
 pub struct World {

@@ -3,7 +3,7 @@ use tickable::Tickable;
 use screen::Screen;
 use state::ProgramState;
 use menu::MenuScreen;
-use geometry;
+use geometry::*;
 use std::mem;
 use labyrinth::Point;
 
@@ -20,45 +20,47 @@ impl PlayScreen {
     }
 }
 
-impl geometry::Worldly for PlayScreen {
-    fn scene(&self) -> geometry::World {
-        let mut shapes  : Vec<geometry::Shape>   = vec!();
-        let mut light : Vec<geometry::Coord3D> = vec!();
+impl Worldly for PlayScreen {
+    fn scene(&self) -> World {
+        let mut shapes : Vec<Shape>   = vec!();
+        let mut light  : Vec<Coord3D> = vec!();
 
         if let Some(ref game) = self.state.game {
-            light.push(geometry::Coord3D(game.player.x as i32,
-                                         game.player.y as i32, 1));
+            light.push(Coord3D(game.player.x as i32,
+                               game.player.y as i32, 1));
 
             for x in 0 .. game.field.0.height() {
                 for y in 0 .. game.field.0.width() {
+                    let coord_to_vertex = |x: &Coord3D| Vertex {
+                                       coords: *x,
+                                       color: RGB(0x6A, 0x20, 0x0C)
+                    };
                     if game.field.0[Point{x: x, y: y}] {
-                        shapes.push(geometry::Shape {
-                            coords: vec!(
-                             geometry::Coord3D((x  ) as i32,( y  ) as i32, 2),
-                             geometry::Coord3D((x+1) as i32,( y  ) as i32, 2),
-                             geometry::Coord3D((x+1) as i32,( y+1) as i32, 2),
-                             geometry::Coord3D((x  ) as i32,( y+1) as i32, 2)),
-                            primitive: geometry::Primitive::TriangleStrip,
-                            color: geometry::ShapeColor::Const(
-                             geometry::RGB(0x6A, 0x20, 0x15))
+                        shapes.push(Shape {
+                            verts: vec!(
+                             Coord3D((x  ) as i32,( y  ) as i32, 2),
+                             Coord3D((x+1) as i32,( y  ) as i32, 2),
+                             Coord3D((x+1) as i32,( y+1) as i32, 2),
+                             Coord3D((x  ) as i32,( y+1) as i32, 2)).
+                                     iter().map(coord_to_vertex).collect(),
+                            primitive: Primitive::TriangleStrip,
                         });
                     } else {
-                        shapes.push(geometry::Shape {
-                            coords: vec!(
-                             geometry::Coord3D((x  ) as i32,( y  ) as i32, 0),
-                             geometry::Coord3D((x+1) as i32,( y  ) as i32, 0),
-                             geometry::Coord3D((x+1) as i32,( y+1) as i32, 0),
-                             geometry::Coord3D((x  ) as i32,( y+1) as i32, 0)),
-                            primitive: geometry::Primitive::TriangleStrip,
-                            color: geometry::ShapeColor::Const(
-                             geometry::RGB(0x6A, 0x20, 0x15))
+                        shapes.push(Shape {
+                            verts: vec!(
+                             Coord3D((x  ) as i32,( y  ) as i32, 0),
+                             Coord3D((x+1) as i32,( y  ) as i32, 0),
+                             Coord3D((x+1) as i32,( y+1) as i32, 0),
+                             Coord3D((x  ) as i32,( y+1) as i32, 0)).
+                                     iter().map(coord_to_vertex).collect(),
+                            primitive: Primitive::TriangleStrip,
                         });
                     }
                 }
             }
         }
 
-        geometry::World {
+        World {
             shapes   : shapes,
             lighting : light
         }
