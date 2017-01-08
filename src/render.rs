@@ -52,11 +52,36 @@ impl Canvas {
             Some(t)
         }
 
+    fn closest_polygon(origin: Coord3D, direction: Vector3<f64>,
+          polys: &Vec<Polygon>) -> Option<(Polygon, f64)> {
+              let mut max = -f64::INFINITY;
+              let mut poly = None;
+              for p in polys {
+                  if let Some(d) = Canvas::raytrace(origin, direction, p) {
+                      if d > max {
+                          max = d;
+                          poly = Some(p);
+                      }
+                  }
+              }
+              poly.map(|&x| (x, max))
+          }
+
     pub fn render(&mut self, scene: World) {
         let origin = Coord3D(0, 0, -1);
+        let poly = scene.shapes.iter().flat_map(|x| x.to_polygons()).collect();
         for a in 0..self.width {
             for b in 0..self.height {
                 for v in scene.shapes.iter() {
+                    let dir : Vector3<f64> = Vector3(
+                        (self.width  as f64 / 2.0 + a as f64) / 15.0,
+                        (self.height as f64 / 2.0 + b as f64) / 15.0,
+                        1.0);
+                    let closest = Canvas::closest_polygon(origin, dir, &poly);
+                    if let Some((p, d)) = closest {
+                        // TODO: Forward color from raytrace
+                        self.pixels[b as usize][a as usize] = p.0.color;
+                    }
                 }
             }
         }

@@ -136,6 +136,7 @@ pub struct Vertex {
     pub color: RGB,
 }
 
+#[derive(Clone, Copy)]
 pub struct Polygon (pub Vertex, pub Vertex, pub Vertex);
 
 pub struct Shape {
