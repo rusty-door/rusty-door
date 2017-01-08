@@ -42,7 +42,6 @@ impl Canvas {
             }
 
             let p = o + direction * t;
-            let c = v0v1 * (p - v0);
 
             if [(v1, v0), (v2, v1), (v0, v2)].iter().any(
                 |&(a, b)| poly_normal.dot((a - b) * (p - b)) < 0.0) {
@@ -67,6 +66,21 @@ impl Canvas {
               poly.map(|(&x, c)| (x, c, max))
           }
 
+    pub fn pixel_color(p: &Polygon, c: Vector3<f64>) -> RGB {
+        let v : Vec<(RGB, Vector3<f64>)> = [p.0, p.1, p.2].iter().map(
+            |x| (x.color, x.coords.into())).collect();
+
+        let colors : Vec<(RGB, f64)> = v.iter().map(
+            |&(rgb, x)| (rgb, (x - c).length())).collect();
+        let t : f64 = colors.iter().map(|&(_,t)| t).sum();
+
+        let r : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.0 as f64 / t).sum();
+        let g : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.1 as f64 / t).sum();
+        let b : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.2 as f64 / t).sum();
+
+        RGB(r as u8, g as u8, b as u8)
+    }
+
     pub fn render(&mut self, scene: World) {
         let origin = Coord3D(0, 0, -1);
         let poly = scene.shapes.iter().flat_map(|x| x.to_polygons()).collect();
@@ -77,9 +91,9 @@ impl Canvas {
                     (self.height as f64 / 2.0 + b as f64) / 15.0,
                     1.0);
                 let closest = Canvas::closest_polygon(origin, dir, &poly);
-                if let Some((p, _, _)) = closest {
-                    // TODO: Forward color from raytrace
-                    self.pixels[b as usize][a as usize] = p.0.color;
+                if let Some((p, c, d)) = closest {
+                    self.pixels[b as usize][a as usize] =
+                        Canvas::pixel_color(&p, c);
                 }
             }
         }

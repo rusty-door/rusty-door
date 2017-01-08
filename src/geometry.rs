@@ -91,6 +91,12 @@ impl<T: Mul<T, Output=T> + Add<T, Output=T>> Vector3<T> {
     }
 }
 
+impl Vector3<f64> {
+    pub fn length(&self) -> f64 {
+        (self.0 * self.0 + self.1 * self.1 + self.2 * self.2).sqrt()
+    }
+}
+
 #[derive(Copy,Clone)]
 pub struct Coord3D (pub i32, pub i32, pub i32);
 
