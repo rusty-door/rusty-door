@@ -1,4 +1,5 @@
 use std::ops::Index;
+use std::ops::Mul;
 use std::convert::From;
 
 #[derive(Clone, Copy)]
@@ -47,6 +48,23 @@ pub struct Axis  (Dimension);
 #[derive(Copy,Clone)]
 pub struct Plane (Dimension);
 
+pub struct Vector3 (pub f32, pub f32, pub f32);
+
+impl Mul<Vector3> for Vector3 {
+    type Output = Vector3;
+    fn mul(self, rhs: Vector3) -> Vector3 {
+        Vector3(self.1 * rhs.2 - self.2 * rhs.1,
+                self.2 * rhs.0 - self.0 * rhs.2,
+                self.0 * rhs.1 - self.1 * rhs.0)
+    }
+}
+
+impl Vector3 {
+    fn dot(self, rhs: Vector3) -> f32 {
+        self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
+    }
+}
+
 #[derive(Copy,Clone)]
 pub struct Coord3D (pub i32, pub i32, pub i32);
 
@@ -58,6 +76,12 @@ impl Index<Axis> for Coord3D {
             Dimension::Y => &self.1,
             Dimension::Z => &self.2
         }
+    }
+}
+
+impl Into<Vector3> for Coord3D {
+    fn into(self) -> Vector3 {
+        Vector3(self.0 as f32, self.1 as f32, self.2 as f32)
     }
 }
 
