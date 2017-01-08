@@ -8,6 +8,7 @@ mod play;
 mod license;
 mod screen;
 mod geometry;
+mod render;
 
 use tickable::Input;
 use screen::Screen;
