@@ -143,8 +143,8 @@ pub struct Shape {
     pub primitive: Primitive,
 }
 
-impl Into<Vec<Polygon>> for Shape {
-    fn into(self: Shape) -> Vec<Polygon> {
+impl Shape {
+    pub fn to_polygons(&self) -> Vec<Polygon> {
         match self.primitive {
             Primitive::TriangleList =>  self.verts.chunks (3).map(|x|
                                  Polygon(x[0], x[1], x[2])).collect(),
