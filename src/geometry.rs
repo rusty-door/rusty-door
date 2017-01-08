@@ -1,5 +1,4 @@
-use std::ops::Index;
-use std::ops::Mul;
+use std::ops::{Index,Mul,Sub,Add};
 use std::convert::From;
 
 #[derive(Clone, Copy)]
@@ -48,19 +47,46 @@ pub struct Axis  (Dimension);
 #[derive(Copy,Clone)]
 pub struct Plane (Dimension);
 
-pub struct Vector3 (pub f32, pub f32, pub f32);
+#[derive(Copy,Clone)]
+pub struct Vector3<T> (pub T, pub T, pub T);
 
-impl Mul<Vector3> for Vector3 {
-    type Output = Vector3;
-    fn mul(self, rhs: Vector3) -> Vector3 {
+impl<T: Copy + Mul<T, Output=T> + Sub<T, Output=T>>
+Mul<Vector3<T>> for Vector3<T> {
+    type Output = Vector3<T>;
+    fn mul(self, rhs: Vector3<T>) -> Vector3<T> {
         Vector3(self.1 * rhs.2 - self.2 * rhs.1,
                 self.2 * rhs.0 - self.0 * rhs.2,
                 self.0 * rhs.1 - self.1 * rhs.0)
     }
 }
 
-impl Vector3 {
-    fn dot(self, rhs: Vector3) -> f32 {
+impl<T: Copy + Mul<T, Output=T>> Mul<T> for Vector3<T> {
+    type Output = Vector3<T>;
+    fn mul(self, rhs: T) -> Vector3<T> {
+        Vector3(rhs * self.0, rhs * self.1, rhs * self.2)
+    }
+}
+
+impl<T: Add<T, Output=T>> Add<Vector3<T>> for Vector3<T> {
+    type Output = Vector3<T>;
+    fn add(self, rhs: Vector3<T>) -> Vector3<T> {
+        Vector3(self.0 + rhs.0,
+                self.1 + rhs.1,
+                self.2 + rhs.2)
+    }
+}
+
+impl<T: Sub<T, Output=T>> Sub<Vector3<T>> for Vector3<T> {
+    type Output = Vector3<T>;
+    fn sub(self, rhs: Vector3<T>) -> Vector3<T> {
+        Vector3(self.0 - rhs.0,
+                self.1 - rhs.1,
+                self.2 - rhs.2)
+    }
+}
+
+impl<T: Mul<T, Output=T> + Add<T, Output=T>> Vector3<T> {
+    pub fn dot(self, rhs: Vector3<T>) -> T {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
 }
@@ -79,9 +105,9 @@ impl Index<Axis> for Coord3D {
     }
 }
 
-impl Into<Vector3> for Coord3D {
-    fn into(self) -> Vector3 {
-        Vector3(self.0 as f32, self.1 as f32, self.2 as f32)
+impl<T: From<i32>> Into<Vector3<T>> for Coord3D {
+    fn into(self) -> Vector3<T> {
+        Vector3(self.0.into(), self.1.into(), self.2.into())
     }
 }
 
@@ -110,7 +136,7 @@ pub struct Vertex {
     pub color: RGB,
 }
 
-pub struct Polygon ([Vertex; 3]);
+pub struct Polygon (pub Vertex, pub Vertex, pub Vertex);
 
 pub struct Shape {
     pub verts: Vec<Vertex>,
@@ -121,9 +147,9 @@ impl Into<Vec<Polygon>> for Shape {
     fn into(self: Shape) -> Vec<Polygon> {
         match self.primitive {
             Primitive::TriangleList =>  self.verts.chunks (3).map(|x|
-                                 Polygon([x[0], x[1], x[2]])).collect(),
+                                 Polygon(x[0], x[1], x[2])).collect(),
             Primitive::TriangleStrip => self.verts.windows(3).map(|x|
-                                 Polygon([x[0], x[1], x[2]])).collect()
+                                 Polygon(x[0], x[1], x[2])).collect()
         }
     }
 }
