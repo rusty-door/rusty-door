@@ -19,7 +19,7 @@ impl Canvas {
         }
     }
 
-    fn raytrace(origin: Coord3D, direction: Vector3<f64>, poly: Polygon) ->
+    fn raytrace(origin: Coord3D, direction: Vector3<f64>, poly: &Polygon) ->
         Option<f64> {
             let v0 : Vector3<f64> = poly.0.coords.into();
             let v1 : Vector3<f64> = poly.1.coords.into();
@@ -60,6 +60,49 @@ impl Canvas {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use geometry::*;
+    use super::Canvas;
+
+    #[test]
+    fn raytrace_test() {
+        let origin = Coord3D(1, 1, 1);
+        let dir : Vector3<f64> = Vector3(-0.125, 1.0, 0.5);
+        let poly = Polygon (
+            Vertex { coords: Coord3D(-1, 8 , 3), color: RGB(0, 0, 0) },
+            Vertex { coords: Coord3D( 1, 10, 2), color: RGB(0, 0, 0) },
+            Vertex { coords: Coord3D( 0, 9 , 5), color: RGB(0, 0, 0) });
+
+        // Valid intersection
+        assert!(Canvas::raytrace(origin, dir, &poly).is_some());
+
+        let another_origin = Coord3D(100, 100, 100);
+
+        // Ray is outside of the triangle
+        assert!(Canvas::raytrace(another_origin, dir, &poly).is_none());
+
+        let another_poly = Polygon (
+            Vertex { coords: Coord3D(-5, -10, -2), color: RGB(0, 0, 0) },
+            Vertex { coords: Coord3D( 5, -12, -1), color: RGB(0, 0, 0) },
+            Vertex { coords: Coord3D( 4, -5 , -6), color: RGB(0, 0, 0) });
+
+        // Ray intersects the triangle behind the origin
+        assert!(Canvas::raytrace(origin, dir, &another_poly).is_none());
+
+        let another_direction : Vector3<f64> = Vector3(1.0, 0.0, 0.0);
+
+        let third_poly = Polygon (
+            Vertex { coords: Coord3D( 5, 4, -2), color: RGB(0, 0, 0) },
+            Vertex { coords: Coord3D( 2, 3, -2), color: RGB(0, 0, 0) },
+            Vertex { coords: Coord3D( 4, 1, -2), color: RGB(0, 0, 0) });
+
+        // Ray is parallel to the triangle
+        assert!(Canvas::raytrace(origin, another_direction,
+                                 &third_poly).is_none());
     }
 }
 
