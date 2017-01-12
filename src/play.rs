@@ -34,28 +34,32 @@ impl Worldly for PlayScreen {
 
             for x in 0 .. h {
                 for y in 0 .. w {
-                    let coord_to_vertex = |c: &Vector3<i32>| Vertex {
+                    let coord_to_vertex = |r: RGB, c: &Vector3<i32>| Vertex {
                                        coords: c.into_inner(),
-                                       color: RGB(0x6A, 0x20, 0x0C)
+                                       color: r
                     };
                     if game.field.0[Point{x: x as usize, y: y as usize}] {
+                        let r = RGB(0x61, 0x40, 0x20);
                         shapes.push(Shape {
                             verts: vec!(
                              Vector3(( y  ) * 640 / w, (x+1) * 480 / h, 3),
                              Vector3(( y+1) * 640 / w, (x+1) * 480 / h, 3),
                              Vector3(( y  ) * 640 / w, (x  ) * 480 / h, 3),
                              Vector3(( y+1) * 640 / w, (x  ) * 480 / h, 3)).
-                                     iter().map(coord_to_vertex).collect(),
+                                     iter().map(|c| coord_to_vertex(r, c)).
+                                     collect(),
                             primitive: Primitive::TriangleStrip,
                         });
                     } else {
+                        let r = RGB(0x40, 0x20, 0x61);
                         shapes.push(Shape {
                             verts: vec!(
-                             Vector3(( y  ) * 640 / w, (x+1) * 480 / h, -2),
-                             Vector3(( y+1) * 640 / w, (x+1) * 480 / h, -2),
-                             Vector3(( y  ) * 640 / w, (x  ) * 480 / h, -2),
-                             Vector3(( y+1) * 640 / w, (x  ) * 480 / h, -2)).
-                                     iter().map(coord_to_vertex).collect(),
+                             Vector3(( y  ) * 640 / w, (x+1) * 480 / h, 4),
+                             Vector3(( y+1) * 640 / w, (x+1) * 480 / h, 4),
+                             Vector3(( y  ) * 640 / w, (x  ) * 480 / h, 4),
+                             Vector3(( y+1) * 640 / w, (x  ) * 480 / h, 4)).
+                                     iter().map(|c| coord_to_vertex(r, c)).
+                                     collect(),
                             primitive: Primitive::TriangleStrip,
                         });
                     }
