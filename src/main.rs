@@ -13,21 +13,17 @@ mod render;
 #[macro_use]
 extern crate glium;
 
-use std::io::Cursor;
 use std::time::{Duration, Instant};
 use std::thread;
 
 use glium::{DisplayBuild, Surface};
 use glium::glutin;
-use glium::index::PrimitiveType;
 
 use glium::glutin::VirtualKeyCode;
 
 use tickable::Input;
 use screen::Screen;
 use direction::{DIR_UP,DIR_DOWN,DIR_LEFT,DIR_RIGHT};
-use std::io::{Read,stdin};
-use geometry::Worldly;
 
 enum Action {
     Continue,
@@ -36,14 +32,14 @@ enum Action {
 }
 
 // Taken from glium.git/examples/support/mod.rs
-pub fn start_loop<F>(scr: &mut Box<Screen>, mut callback: F)
-    where F: FnMut() -> Action {
+fn start_loop<F>(scr: &mut Box<Screen>, mut callback: F)
+    where F: FnMut(&geometry::World) -> Action {
         let mut accumulator = Duration::new(0, 0);
         let mut previous_clock = Instant::now();
 
         loop {
             let mut key = None;
-            match callback() {
+            match callback(&scr.scene()) {
                 Action::Stop => break,
                 Action::Key(k) => key = Some(k),
                 Action::Continue => ()
@@ -88,7 +84,7 @@ fn main() {
 
     let pr = state::ProgramState::new();
     let mut scr : Box<Screen> = Box::new(menu::MenuScreen::new(pr));
-    start_loop(&mut scr, || {
+    start_loop(&mut scr, |scene| {
         for event in display.poll_events() {
             match event {
                 glutin::Event::Closed => return Action::Stop,
@@ -100,6 +96,17 @@ fn main() {
                 _ => ()
             }
         }
+        let mut canvas = render::Canvas::new(640, 480);
+        canvas.render(scene);
+        let pixels : Vec<Vec<(u8, u8, u8)>> = canvas.pixels().iter().map(
+            |r| r.iter().map(
+                |&geometry::RGB(r, g, b)| (r, g, b)).collect()).collect();
+        let opengl_texture = glium::Texture2d::new(&display, pixels).unwrap();
+
+        let target = display.draw();
+        opengl_texture.as_surface().fill(
+            &target, glium::uniforms::MagnifySamplerFilter::Linear);
+        target.finish().unwrap();
         Action::Continue
     });
 

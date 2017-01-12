@@ -2,11 +2,11 @@ use geometry::*;
 use std::convert::Into;
 use std::f64;
 
-struct Canvas {
+pub struct Canvas {
     width: u16,
     height: u16,
     pixels: Vec<Vec<RGB>>,
-    zbuffer: Vec<Vec<u16>>,
+    zbuffer: Vec<Vec<f64>>,
 }
 
 impl Canvas {
@@ -15,8 +15,12 @@ impl Canvas {
             width: w,
             height: h,
             pixels: vec!(vec!(RGB(0, 0, 0); w as usize); h as usize),
-            zbuffer: vec!(vec!(0; w as usize); h as usize),
+            zbuffer: vec!(vec!(0.0; w as usize); h as usize),
         }
+    }
+
+    pub fn pixels(&self) -> &Vec<Vec<RGB>> {
+        &self.pixels
     }
 
     fn raytrace(origin: Coord3D, direction: Vector3<f64>, poly: &Polygon) ->
@@ -81,7 +85,7 @@ impl Canvas {
         RGB(r as u8, g as u8, b as u8)
     }
 
-    pub fn render(&mut self, scene: World) {
+    pub fn render(&mut self, scene: &World) {
         let origin = Coord3D(0, 0, -1);
         let poly = scene.shapes.iter().flat_map(|x| x.to_polygons()).collect();
         for a in 0..self.width {
@@ -94,6 +98,7 @@ impl Canvas {
                 if let Some((p, c, d)) = closest {
                     self.pixels[b as usize][a as usize] =
                         Canvas::pixel_color(&p, c);
+                    self.zbuffer[b as usize][a as usize] = d
                 }
             }
         }
