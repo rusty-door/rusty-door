@@ -31,27 +31,27 @@ impl Worldly for PlayScreen {
 
             for x in 0 .. game.field.0.height() {
                 for y in 0 .. game.field.0.width() {
-                    let coord_to_vertex = |x: &Coord3D| Vertex {
-                                       coords: *x,
+                    let coord_to_vertex = |c: &Coord3D| Vertex {
+                                       coords: *c,
                                        color: RGB(0x6A, 0x20, 0x0C)
                     };
                     if game.field.0[Point{x: x, y: y}] {
                         shapes.push(Shape {
                             verts: vec!(
-                             Coord3D((x  ) as i32,( y  ) as i32, 2),
-                             Coord3D((x+1) as i32,( y  ) as i32, 2),
-                             Coord3D((x+1) as i32,( y+1) as i32, 2),
-                             Coord3D((x  ) as i32,( y+1) as i32, 2)).
+                             Coord3D(( y  ) as i32, (x+1) as i32, 2),
+                             Coord3D(( y  ) as i32, (x  ) as i32, 2),
+                             Coord3D(( y+1) as i32, (x+1) as i32, 2),
+                             Coord3D(( y+1) as i32, (x  ) as i32, 2)).
                                      iter().map(coord_to_vertex).collect(),
                             primitive: Primitive::TriangleStrip,
                         });
                     } else {
                         shapes.push(Shape {
                             verts: vec!(
-                             Coord3D((x  ) as i32,( y  ) as i32, 0),
-                             Coord3D((x+1) as i32,( y  ) as i32, 0),
-                             Coord3D((x+1) as i32,( y+1) as i32, 0),
-                             Coord3D((x  ) as i32,( y+1) as i32, 0)).
+                             Coord3D(( y  ) as i32, (x  ) as i32, 0),
+                             Coord3D(( y  ) as i32, (x+1) as i32, 0),
+                             Coord3D(( y+1) as i32, (x+1) as i32, 0),
+                             Coord3D(( y+1) as i32, (x  ) as i32, 0)).
                                      iter().map(coord_to_vertex).collect(),
                             primitive: Primitive::TriangleStrip,
                         });
