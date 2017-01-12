@@ -5,3 +5,5 @@ authors = ["Dmitry Khalansky <rouanth@gmail.com>",
            "Evgeny Fomin <fominok@hotmail.com>"]
 
 [dependencies]
+glium = "*"
+glutin = "*"
