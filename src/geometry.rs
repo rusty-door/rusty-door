@@ -5,7 +5,14 @@ use std::convert::From;
 pub struct RGB (pub u8, pub u8, pub u8);
 
 #[derive(Copy,Clone)]
-pub struct Coord2D (i32, i32);
+pub enum Dimension {
+    X,
+    Y,
+    Z
+}
+
+#[derive(Copy,Clone)]
+pub struct Axis (pub Dimension);
 
 #[derive(Copy,Clone)]
 pub struct Vector3<T> (pub T, pub T, pub T);
@@ -51,18 +58,15 @@ impl<T: Mul<T, Output=T> + Add<T, Output=T>> Vector3<T> {
     }
 }
 
-impl Vector3<f64> {
-    pub fn length(&self) -> f64 {
-        (self.0 * self.0 + self.1 * self.1 + self.2 * self.2).sqrt()
+impl<T> Vector3<T> {
+    pub fn into_inner<K>(self) -> Vector3<K> where K: From<T> {
+        Vector3(self.0.into(), self.1.into(), self.2.into())
     }
 }
 
-#[derive(Copy,Clone)]
-pub struct Coord3D (pub i32, pub i32, pub i32);
-
-impl<T: From<i32>> Into<Vector3<T>> for Coord3D {
-    fn into(self) -> Vector3<T> {
-        Vector3(self.0.into(), self.1.into(), self.2.into())
+impl Vector3<f64> {
+    pub fn length(&self) -> f64 {
+        (self.0 * self.0 + self.1 * self.1 + self.2 * self.2).sqrt()
     }
 }
 
@@ -73,7 +77,7 @@ pub enum Primitive {
 
 #[derive(Clone, Copy)]
 pub struct Vertex {
-    pub coords: Coord3D,
+    pub coords: Vector3<f64>,
     pub color: RGB,
 }
 
@@ -98,7 +102,7 @@ impl Shape {
 
 pub struct World {
     pub shapes: Vec<Shape>,
-    pub lighting: Vec<Coord3D>,
+    pub lighting: Vec<Vector3<f64>>,
 }
 
 pub trait Worldly {

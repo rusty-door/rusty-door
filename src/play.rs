@@ -22,39 +22,39 @@ impl PlayScreen {
 
 impl Worldly for PlayScreen {
     fn scene(&self) -> World {
-        let mut shapes : Vec<Shape>   = vec!();
-        let mut light  : Vec<Coord3D> = vec!();
+        let mut shapes : Vec<Shape>        = vec!();
+        let mut light  : Vec<Vector3<f64>> = vec!();
 
         if let Some(ref game) = self.state.game {
-            light.push(Coord3D(game.player.x as i32,
-                               game.player.y as i32, 1));
+            light.push(Vector3(game.player.x as i32, game.player.y as i32,
+                              1).into_inner());
 
             let w = game.field.0.width() as i32;
             let h = game.field.0.height() as i32;
 
             for x in 0 .. h {
                 for y in 0 .. w {
-                    let coord_to_vertex = |c: &Coord3D| Vertex {
-                                       coords: *c,
+                    let coord_to_vertex = |c: &Vector3<i32>| Vertex {
+                                       coords: c.into_inner(),
                                        color: RGB(0x6A, 0x20, 0x0C)
                     };
                     if game.field.0[Point{x: x as usize, y: y as usize}] {
                         shapes.push(Shape {
                             verts: vec!(
-                             Coord3D(( y  ) * 640 / w, (x+1) * 480 / h, 3),
-                             Coord3D(( y+1) * 640 / w, (x+1) * 480 / h, 3),
-                             Coord3D(( y  ) * 640 / w, (x  ) * 480 / h, 3),
-                             Coord3D(( y+1) * 640 / w, (x  ) * 480 / h, 3)).
+                             Vector3(( y  ) * 640 / w, (x+1) * 480 / h, 3),
+                             Vector3(( y+1) * 640 / w, (x+1) * 480 / h, 3),
+                             Vector3(( y  ) * 640 / w, (x  ) * 480 / h, 3),
+                             Vector3(( y+1) * 640 / w, (x  ) * 480 / h, 3)).
                                      iter().map(coord_to_vertex).collect(),
                             primitive: Primitive::TriangleStrip,
                         });
                     } else {
                         shapes.push(Shape {
                             verts: vec!(
-                             Coord3D(( y  ) * 640 / w, (x+1) * 480 / h, -2),
-                             Coord3D(( y+1) * 640 / w, (x+1) * 480 / h, -2),
-                             Coord3D(( y  ) * 640 / w, (x  ) * 480 / h, -2),
-                             Coord3D(( y+1) * 640 / w, (x  ) * 480 / h, -2)).
+                             Vector3(( y  ) * 640 / w, (x+1) * 480 / h, -2),
+                             Vector3(( y+1) * 640 / w, (x+1) * 480 / h, -2),
+                             Vector3(( y  ) * 640 / w, (x  ) * 480 / h, -2),
+                             Vector3(( y+1) * 640 / w, (x  ) * 480 / h, -2)).
                                      iter().map(coord_to_vertex).collect(),
                             primitive: Primitive::TriangleStrip,
                         });

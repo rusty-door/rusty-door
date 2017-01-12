@@ -23,7 +23,7 @@ impl Canvas {
         &self.pixels
     }
 
-    fn raytrace(origin: Coord3D, direction: Vector3<f64>, poly: &Polygon) ->
+    fn raytrace(origin: Vector3<f64>, direction: Vector3<f64>, poly: &Polygon)->
         Option<(f64, Vector3<f64>)> {
             let v0 : Vector3<f64> = poly.0.coords.into();
             let v1 : Vector3<f64> = poly.1.coords.into();
@@ -39,7 +39,7 @@ impl Canvas {
             }
 
             let d = poly_normal.dot(v0);
-            let t = (poly_normal.dot(origin.into()) + d)/triangle_ray_dot;
+            let t = (poly_normal.dot(origin) + d)/triangle_ray_dot;
 
             if t < 0.0 {
                 return None;
@@ -55,7 +55,7 @@ impl Canvas {
             Some((t, p))
         }
 
-    fn closest_polygon(origin: Coord3D, direction: Vector3<f64>,
+    fn closest_polygon(origin: Vector3<f64>, direction: Vector3<f64>,
           polys: &Vec<Polygon>) -> Option<(Polygon, Vector3<f64>, f64)> {
               let mut max = -f64::INFINITY;
               let mut poly = None;
@@ -86,7 +86,7 @@ impl Canvas {
     }
 
     pub fn render(&mut self, scene: &World) {
-        let origin = Coord3D(self.width as i32 / 2, self.height as i32 / 2, -1);
+        let origin = Vector3(self.width as i32 / 2, self.height as i32 / 2, -1);
         let poly = scene.shapes.iter().flat_map(|x| x.to_polygons()).collect();
         for a in 0..self.width {
             for b in 0..self.height {
@@ -94,7 +94,9 @@ impl Canvas {
                     (a as f64 - self.width  as f64 / 2.0),
                     (b as f64 - self.height as f64 / 2.0),
                     1.0);
-                let closest = Canvas::closest_polygon(origin, dir, &poly);
+                let closest = Canvas::closest_polygon(origin.into_inner(),
+                                                     dir,
+                                                     &poly);
                 if let Some((p, c, d)) = closest {
                     self.pixels[b as usize][a as usize] =
                         Canvas::pixel_color(&p, c);
