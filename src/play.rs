@@ -42,10 +42,10 @@ impl Worldly for PlayScreen {
                         let r = RGB(0x61, 0x40, 0x20);
                         shapes.push(Shape {
                             verts: vec!(
-                             Vector3(( y  ) * 640 / w, (x+1) * 480 / h, 3),
-                             Vector3(( y+1) * 640 / w, (x+1) * 480 / h, 3),
-                             Vector3(( y  ) * 640 / w, (x  ) * 480 / h, 3),
-                             Vector3(( y+1) * 640 / w, (x  ) * 480 / h, 3)).
+                             Vector3(( y  ) * 640 / w, (x+1) * 480 / h, 2),
+                             Vector3(( y+1) * 640 / w, (x+1) * 480 / h, 2),
+                             Vector3(( y  ) * 640 / w, (x  ) * 480 / h, 2),
+                             Vector3(( y+1) * 640 / w, (x  ) * 480 / h, 2)).
                                      iter().map(|c| coord_to_vertex(r, c)).
                                      collect(),
                             primitive: Primitive::TriangleStrip,
@@ -54,10 +54,10 @@ impl Worldly for PlayScreen {
                         let r = RGB(0x40, 0x20, 0x61);
                         shapes.push(Shape {
                             verts: vec!(
-                             Vector3(( y  ) * 640 / w, (x+1) * 480 / h, 4),
-                             Vector3(( y+1) * 640 / w, (x+1) * 480 / h, 4),
-                             Vector3(( y  ) * 640 / w, (x  ) * 480 / h, 4),
-                             Vector3(( y+1) * 640 / w, (x  ) * 480 / h, 4)).
+                             Vector3(( y  ) * 640 / w, (x+1) * 480 / h, 2),
+                             Vector3(( y+1) * 640 / w, (x+1) * 480 / h, 2),
+                             Vector3(( y  ) * 640 / w, (x  ) * 480 / h, 2),
+                             Vector3(( y+1) * 640 / w, (x  ) * 480 / h, 2)).
                                      iter().map(|c| coord_to_vertex(r, c)).
                                      collect(),
                             primitive: Primitive::TriangleStrip,
@@ -66,6 +66,20 @@ impl Worldly for PlayScreen {
                 }
             }
         }
+        let coord_to_vertex = |r: RGB, c: &Vector3<f64>| Vertex {
+                           coords: *c,
+                           color: r
+        };
+        shapes.push(Shape {
+                   verts: vec!(
+                       Vector3(0.1  , 479.0, 3.1),
+                       Vector3(0.1  , 0.1  , 3.1),
+                       Vector3(639.0, 479.0, 3.1),
+                       Vector3(639.0, 0.1  , 3.1)).iter().map(
+                           |c| coord_to_vertex(RGB(0x15, 0x15, 0x15), c)).
+                           collect(),
+                   primitive: Primitive::TriangleStrip,
+        });
 
         World {
             shapes   : shapes,
