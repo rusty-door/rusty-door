@@ -29,29 +29,32 @@ impl Worldly for PlayScreen {
             light.push(Coord3D(game.player.x as i32,
                                game.player.y as i32, 1));
 
-            for x in 0 .. game.field.0.height() {
-                for y in 0 .. game.field.0.width() {
+            let w = game.field.0.width() as i32;
+            let h = game.field.0.height() as i32;
+
+            for x in 0 .. h {
+                for y in 0 .. w {
                     let coord_to_vertex = |c: &Coord3D| Vertex {
                                        coords: *c,
                                        color: RGB(0x6A, 0x20, 0x0C)
                     };
-                    if game.field.0[Point{x: x, y: y}] {
+                    if game.field.0[Point{x: x as usize, y: y as usize}] {
                         shapes.push(Shape {
                             verts: vec!(
-                             Coord3D(( y  ) as i32, (x+1) as i32, 2),
-                             Coord3D(( y  ) as i32, (x  ) as i32, 2),
-                             Coord3D(( y+1) as i32, (x+1) as i32, 2),
-                             Coord3D(( y+1) as i32, (x  ) as i32, 2)).
+                             Coord3D(( y  ) * 640 / w, (x+1) * 480 / h, 3),
+                             Coord3D(( y+1) * 640 / w, (x+1) * 480 / h, 3),
+                             Coord3D(( y  ) * 640 / w, (x  ) * 480 / h, 3),
+                             Coord3D(( y+1) * 640 / w, (x  ) * 480 / h, 3)).
                                      iter().map(coord_to_vertex).collect(),
                             primitive: Primitive::TriangleStrip,
                         });
                     } else {
                         shapes.push(Shape {
                             verts: vec!(
-                             Coord3D(( y  ) as i32, (x  ) as i32, 0),
-                             Coord3D(( y  ) as i32, (x+1) as i32, 0),
-                             Coord3D(( y+1) as i32, (x+1) as i32, 0),
-                             Coord3D(( y+1) as i32, (x  ) as i32, 0)).
+                             Coord3D(( y  ) * 640 / w, (x+1) * 480 / h, -2),
+                             Coord3D(( y+1) * 640 / w, (x+1) * 480 / h, -2),
+                             Coord3D(( y  ) * 640 / w, (x  ) * 480 / h, -2),
+                             Coord3D(( y+1) * 640 / w, (x  ) * 480 / h, -2)).
                                      iter().map(coord_to_vertex).collect(),
                             primitive: Primitive::TriangleStrip,
                         });

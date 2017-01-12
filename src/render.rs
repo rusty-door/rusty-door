@@ -86,13 +86,13 @@ impl Canvas {
     }
 
     pub fn render(&mut self, scene: &World) {
-        let origin = Coord3D(0, 0, -1);
+        let origin = Coord3D(self.width as i32 / 2, self.height as i32 / 2, -1);
         let poly = scene.shapes.iter().flat_map(|x| x.to_polygons()).collect();
         for a in 0..self.width {
             for b in 0..self.height {
                 let dir : Vector3<f64> = Vector3(
-                    (self.width  as f64 / 2.0 + a as f64) / 15.0,
-                    (self.height as f64 / 2.0 + b as f64) / 15.0,
+                    (a as f64 - self.width  as f64 / 2.0),
+                    (b as f64 - self.height as f64 / 2.0),
                     1.0);
                 let closest = Canvas::closest_polygon(origin, dir, &poly);
                 if let Some((p, c, d)) = closest {
