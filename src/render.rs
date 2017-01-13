@@ -112,7 +112,7 @@ impl<'b> Space<'b> {
                 unwrap() as i32);
 
         let nearest_bound = |c: &Vector3<i32>, d: Dimension| {
-            (c[d] + dir_sign[d]) as f64 * match d {
+            (c[d] + if (dir_sign[d] > 0) { 1 } else { 0 }) as f64 * match d {
                 Dimension::X => 640.0,
                 Dimension::Y => 480.0,
                 Dimension::Z =>  10.0
