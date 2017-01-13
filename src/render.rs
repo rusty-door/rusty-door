@@ -96,7 +96,9 @@ impl<'b> Space<'b> {
             if direction[Dimension::Z] > 0.0 { 1 } else { -1 },
         );
 
-        let dims = [Dimension::X, Dimension::Y, Dimension::Z];
+        let dims : Vec<Dimension> = [Dimension::X, Dimension::Y, Dimension::Z].
+            iter().filter(|&&x| direction[x].abs() > f64::EPSILON).
+            map(|&x| x).collect();
         for &d in dims.iter() {
             if point[d] < 0.0 {
                 point = point - direction * inv_dir[d] * point[d];
