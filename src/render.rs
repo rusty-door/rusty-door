@@ -74,10 +74,11 @@ impl<'b> Space<'b> {
             Dimension::Y => (0.0, 480.0),
             Dimension::Z => (0.0, 10.0),
         };
-        if a >= ar.1 || a < ar.0 {
+        if a > ar.1 || a < ar.0 {
             None
         } else {
-            Some(((a - ar.0) * 12 as f64 / (ar.1 - ar.0)).floor() as usize)
+            [((a - ar.0) * 12 as f64 / (ar.1 - ar.0)).floor() as usize, 12 - 1].
+                iter().min().map(|&x| x)
         }
     }
 
