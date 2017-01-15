@@ -1,5 +1,6 @@
 mod geometry;
 mod render;
+mod scene;
 
 #[macro_use]
 extern crate glium;
@@ -30,11 +31,7 @@ fn start_loop<F>(scr: &mut State, mut callback: F)
 
         loop {
             let mut key = None;
-            let scene = geometry::World {
-                shapes: vec!(),
-                lighting: vec!()
-            };
-            match callback(&scene) {
+            match callback(&scene::scene()) {
                 Action::Stop => break,
                 Action::Key(k) => key = Some(k),
                 Action::Continue => ()
