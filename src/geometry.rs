@@ -100,27 +100,40 @@ pub enum Primitive {
     TriangleStrip
 }
 
-#[derive(Clone, Copy, Debug)]
-pub struct Vertex {
-    pub coords: Vector3<f64>,
-    pub color: RGB,
+#[derive(Clone, Copy)]
+pub enum ColorGenerator {
+    Uniform(RGB),
+    Linear(RGB, RGB, RGB),
 }
 
-#[derive(Clone, Copy, Debug)]
-pub struct Polygon (pub Vertex, pub Vertex, pub Vertex);
+#[derive(Clone, Copy)]
+pub struct Material {
+    pub color: ColorGenerator
+}
+
+#[derive(Clone, Copy)]
+pub struct Polygon {
+    pub coords: (Vector3<f64>, Vector3<f64>, Vector3<f64>),
+    pub material: Material,
+}
 
 pub struct Shape {
-    pub verts: Vec<Vertex>,
+    pub verts: Vec<Vector3<f64>>,
+    pub material: Material,
     pub primitive: Primitive,
 }
 
 impl Shape {
     pub fn to_polygons(&self) -> Vec<Polygon> {
+        let g = |x : &[Vector3<f64>]| Polygon {
+            coords : (x[0], x[1], x[2]),
+            material : self.material,
+        };
         match self.primitive {
-            Primitive::TriangleList =>  self.verts.chunks (3).map(|x|
-                                 Polygon(x[0], x[1], x[2])).collect(),
-            Primitive::TriangleStrip => self.verts.windows(3).map(|x|
-                                 Polygon(x[0], x[1], x[2])).collect()
+            Primitive::TriangleList =>  self.verts.chunks (3).map(
+                g).collect(),
+            Primitive::TriangleStrip => self.verts.windows(3).map(
+                g).collect()
         }
     }
 }

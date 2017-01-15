@@ -78,7 +78,8 @@ fn main() {
         canvas.render(scene);
         let pixels : Vec<Vec<(u8, u8, u8)>> = canvas.pixels().iter().map(
             |r| r.iter().map(
-                |&geometry::RGB(r, g, b)| (r, g, b)).collect()).collect();
+                |&geometry::RGB(r, g, b)| (0xFF - r, 0xFF - g, 0xFF - b)
+                ).collect()).collect();
         let opengl_texture = glium::Texture2d::new(&display, pixels).unwrap();
 
         let target = display.draw();

@@ -30,9 +30,7 @@ impl<'b> Space<'b> {
     fn new(poly: &'b Vec<Polygon>) -> Space<'b> {
         let mut g : [[[Voxel; 12]; 12]; 12] = Default::default();
         for p in poly {
-            let verts = [p.0, p.1, p.2];
-            let coords : Vec<&Vector3<f64>> = verts.iter().map(
-                |x| &x.coords).collect();
+            let coords = [p.coords.0, p.coords.1, p.coords.2];
 
             let cmp = |x: &f64, y: &f64| -> Ordering {
                 if *x < *y {
@@ -50,11 +48,9 @@ impl<'b> Space<'b> {
             zs.sort_by(&cmp);
 
             let range = |a: &Vec<f64>, d: Dimension| {
-                match (Space::dimension_idx(a[0], d),
-                       Space::dimension_idx(a[2], d)) {
-                    (Some(left), Some(right)) => left..(right + 1),
-                    _ => 0..0
-                }
+                let lp = Space::dimension_idx(a[0], d).unwrap_or(0);
+                let rp = Space::dimension_idx(a[2], d).unwrap_or(11);
+                lp..rp + 1
             };
 
             for x in range(&xs, Dimension::X) {
@@ -115,7 +111,7 @@ impl<'b> Space<'b> {
                 unwrap() as i32);
 
         let nearest_bound = |c: &Vector3<i32>, d: Dimension| {
-            (c[d] + if (dir_sign[d] > 0) { 1 } else { 0 }) as f64 * match d {
+            (c[d] + if dir_sign[d] > 0 { 1 } else { 0 }) as f64 * match d {
                 Dimension::X => 640.0,
                 Dimension::Y => 480.0,
                 Dimension::Z =>  10.0
@@ -127,10 +123,6 @@ impl<'b> Space<'b> {
                 (nearest_bound(&coords, Dimension::Y) - point[Dimension::Y]) * inv_dir[Dimension::Y],
                 (nearest_bound(&coords, Dimension::Z) - point[Dimension::Z]) * inv_dir[Dimension::Z],
             );
-
-        let t_delta = Vector3(640.0 / 12 as f64 * inv_dir[Dimension::X],
-                              480.0 / 12 as f64 * inv_dir[Dimension::Y],
-                               10.0 / 12 as f64 * inv_dir[Dimension::Z]);
 
         let coords_usize = (coords.0 as usize,
                             coords.1 as usize,
@@ -184,9 +176,7 @@ impl Canvas {
 
     fn raytrace(origin: Vector3<f64>, direction: Vector3<f64>, poly: &Polygon)->
         Option<(f64, Vector3<f64>)> {
-            let v0 : Vector3<f64> = poly.0.coords.into();
-            let v1 : Vector3<f64> = poly.1.coords.into();
-            let v2 : Vector3<f64> = poly.2.coords.into();
+            let (v0, v1, v2) = poly.coords;
             let v0v1 = v1 - v0;
             let v0v2 = v2 - v0;
             let poly_normal = v0v1 * v0v2;
@@ -264,18 +254,19 @@ impl Canvas {
           }
 
     pub fn pixel_color(p: &Polygon, c: Vector3<f64>) -> RGB {
-        let v : Vec<(RGB, Vector3<f64>)> = [p.0, p.1, p.2].iter().map(
-            |x| (x.color, x.coords.into())).collect();
-
-        let colors : Vec<(RGB, f64)> = v.iter().map(
-            |&(rgb, x)| (rgb, (x - c).length())).collect();
-        let t : f64 = colors.iter().map(|&(_,t)| t).sum();
-
-        let r : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.0 as f64 / t).sum();
-        let g : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.1 as f64 / t).sum();
-        let b : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.2 as f64 / t).sum();
-
-        RGB(r as u8, g as u8, b as u8)
+//        let v : Vec<(RGB, Vector3<f64>)> = [p.0, p.1, p.2].iter().map(
+//            |x| (x.color, x.coords.into())).collect();
+//
+//        let colors : Vec<(RGB, f64)> = v.iter().map(
+//            |&(rgb, x)| (rgb, (x - c).length())).collect();
+//        let t : f64 = colors.iter().map(|&(_,t)| t).sum();
+//
+//        let r : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.0 as f64 / t).sum();
+//        let g : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.1 as f64 / t).sum();
+//        let b : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.2 as f64 / t).sum();
+//
+//        RGB(r as u8, g as u8, b as u8)
+          RGB(0x33, 0x33, 0x33)
     }
 
     pub fn render(&mut self, scene: &World) {
