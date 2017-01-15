@@ -1,13 +1,10 @@
 use geometry::*;
-use std::convert::Into;
 use std::f64;
-use std::cmp::Ordering;
 
 pub struct Canvas {
     width: u16,
     height: u16,
     pixels: Vec<Vec<RGB>>,
-    zbuffer: Vec<Vec<f64>>,
 }
 
 impl Canvas {
@@ -16,7 +13,6 @@ impl Canvas {
             width: w,
             height: h,
             pixels: vec!(vec!(RGB(0, 0, 0); w as usize); h as usize),
-            zbuffer: vec!(vec!(0.0; w as usize); h as usize),
         }
     }
 
@@ -27,9 +23,8 @@ impl Canvas {
     fn raytrace(origin: Vector3<f64>, direction: Vector3<f64>, poly: &Polygon)->
         Option<(f64, Vector3<f64>)> {
             let (v0, v1, v2) = poly.coords;
-            let v0v1 = v1 - v0;
-            let v0v2 = v2 - v0;
-            let poly_normal = v0v1 * v0v2;
+            let poly_normal = poly.normal();
+
             let triangle_ray_dot = poly_normal.dot(direction);
 
             if triangle_ray_dot.abs() < f64::EPSILON {
@@ -68,6 +63,32 @@ impl Canvas {
               poly.map(|(&p, c)| (p, c, min))
           }
 
+    fn lambert_contribution(point: Vector3<f64>, polys: &Vec<Polygon>,
+    lights: &Vec<Vector3<f64>>, normal: Vector3<f64>) -> f64 {
+        lights.iter().map(
+            |&x| {
+                let dir = *(x - point).normalize();
+                if let Some(_) = Canvas::closest_polygon(
+                    point + dir * 1e-6, dir, polys) {
+                        0.0
+                    } else {
+                        dir.dot(normal)
+                    }
+            }).sum()
+    }
+
+    fn get_pixel_color(origin: Vector3<f64>, direction: Vector3<f64>,
+        polys: &Vec<Polygon>, lights: &Vec<Vector3<f64>>) -> RGB {
+            let closest = Canvas::closest_polygon(origin.into_inner(),
+                                                 direction,
+                                                 polys);
+            if let Some((p, c, _)) = closest {
+                p.color_at(c)
+            } else {
+                RGB(0x00, 0x00, 0x00)
+            }
+        }
+
     pub fn render(&mut self, scene: &World) {
         let origin = Vector3(self.width  as f64 / 2.0,
                              self.height as f64 / 2.0,
@@ -79,13 +100,9 @@ impl Canvas {
                     (a as f64 - self.width  as f64 / 2.0),
                     (b as f64 - self.height as f64 / 2.0),
                     1.0);
-                let closest = Canvas::closest_polygon(origin.into_inner(),
-                                                     dir,
-                                                     &poly);
-                if let Some((p, c, d)) = closest {
-                    self.pixels[b as usize][a as usize] = p.color_at(c);
-                    self.zbuffer[b as usize][a as usize] = d;
-                }
+                self.pixels[b as usize][a as usize] =
+                    Canvas::get_pixel_color(origin, dir, &poly,
+                                           &scene.lighting);
             }
         }
     }
