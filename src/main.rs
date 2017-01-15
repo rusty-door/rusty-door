@@ -1,12 +1,3 @@
-mod labyrinth;
-mod menu;
-mod tickable;
-mod state;
-mod direction;
-mod game;
-mod play;
-mod license;
-mod screen;
 mod geometry;
 mod render;
 
@@ -21,25 +12,29 @@ use glium::glutin;
 
 use glium::glutin::VirtualKeyCode;
 
-use tickable::Input;
-use screen::Screen;
-use direction::{DIR_UP,DIR_DOWN,DIR_LEFT,DIR_RIGHT};
-
 enum Action {
     Continue,
     Key(glutin::VirtualKeyCode),
     Stop
 }
 
+struct State {
+
+}
+
 // Taken from glium.git/examples/support/mod.rs
-fn start_loop<F>(scr: &mut Box<Screen>, mut callback: F)
+fn start_loop<F>(scr: &mut State, mut callback: F)
     where F: FnMut(&geometry::World) -> Action {
         let mut accumulator = Duration::new(0, 0);
         let mut previous_clock = Instant::now();
 
         loop {
             let mut key = None;
-            match callback(&scr.scene()) {
+            let scene = geometry::World {
+                shapes: vec!(),
+                lighting: vec!()
+            };
+            match callback(&scene) {
                 Action::Stop => break,
                 Action::Key(k) => key = Some(k),
                 Action::Continue => ()
@@ -54,22 +49,6 @@ fn start_loop<F>(scr: &mut Box<Screen>, mut callback: F)
                 accumulator -= fixed_time_stamp;
 
                 // Modifying the state of the game
-                if let Some(b) = key {
-                    let ev = match b {
-                        VirtualKeyCode::H => Some(Input::Direction(DIR_LEFT)),
-                        VirtualKeyCode::J => Some(Input::Direction(DIR_DOWN)),
-                        VirtualKeyCode::K => Some(Input::Direction(DIR_UP)),
-                        VirtualKeyCode::L => Some(Input::Direction(DIR_RIGHT)),
-                        VirtualKeyCode::Z => Some(Input::Accept),
-                        VirtualKeyCode::X => Some(Input::Cancel),
-                        VirtualKeyCode::Colon => Some(Input::Menu),
-                        _ => None
-                    };
-                    if let Some(f) = scr.tick(ev) {
-                        *scr = f;
-                    }
-                    println!("{:?}", scr);
-                }
             }
 
             thread::sleep(fixed_time_stamp - accumulator);
@@ -79,11 +58,13 @@ fn start_loop<F>(scr: &mut Box<Screen>, mut callback: F)
 fn main() {
     let display = glutin::WindowBuilder::new()
         .with_vsync()
+        .with_dimensions(640, 480)
         .build_glium()
         .unwrap();
 
-    let pr = state::ProgramState::new();
-    let mut scr : Box<Screen> = Box::new(menu::MenuScreen::new(pr));
+    let mut scr = State {
+        };
+
     start_loop(&mut scr, |scene| {
         for event in display.poll_events() {
             match event {
