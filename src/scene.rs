@@ -11,7 +11,7 @@ pub fn scene() -> World {
             Vector3(600.0, 50.0, 0.1),
         ),
         material: Material {
-            color: ColorGenerator::Uniform(RGB(0x33, 0x33, 0x33)),
+            color: ColorGenerator::Uniform(RGB(0x66, 0xFF, 0x30)),
         }
     };
     World {

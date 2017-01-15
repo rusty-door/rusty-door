@@ -84,8 +84,11 @@ impl<T: Mul<T, Output=T> + Add<T, Output=T> + Copy> Vector3<T> {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
 
-    pub fn length(&self) -> T {
-        self.0 * self.0 + self.1 * self.1 + self.2 * self.2
+}
+
+impl Vector3<f64> {
+    pub fn length(&self) -> f64 {
+        (self.0 * self.0 + self.1 * self.1 + self.2 * self.2).sqrt()
     }
 }
 
@@ -115,6 +118,28 @@ pub struct Material {
 pub struct Polygon {
     pub coords: (Vector3<f64>, Vector3<f64>, Vector3<f64>),
     pub material: Material,
+}
+
+impl Polygon {
+    pub fn color_at(&self, point: Vector3<f64>) -> RGB {
+        match self.material.color {
+            ColorGenerator::Uniform(rgb) => rgb,
+            ColorGenerator::Linear(c1, c2, c3) => {
+                let dists : Vec<f64> =
+                    [self.coords.0, self.coords.1, self.coords.2].
+                    iter().map(|&x| (x - point).length()).collect();
+                let t : f64 = dists.iter().sum();
+                let colors : Vec<(RGB, f64)> = [c1, c2, c3].iter().zip(
+                    dists.iter()).map(|(&x, &y)| (x, y)).collect();
+
+                let r : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.0 as f64 / t).sum();
+                let g : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.1 as f64 / t).sum();
+                let b : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.2 as f64 / t).sum();
+
+                RGB(r as u8, g as u8, b as u8)
+            }
+        }
+    }
 }
 
 pub struct Shape {

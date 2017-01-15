@@ -253,22 +253,6 @@ impl Canvas {
                   */
           }
 
-    pub fn pixel_color(p: &Polygon, c: Vector3<f64>) -> RGB {
-//        let v : Vec<(RGB, Vector3<f64>)> = [p.0, p.1, p.2].iter().map(
-//            |x| (x.color, x.coords.into())).collect();
-//
-//        let colors : Vec<(RGB, f64)> = v.iter().map(
-//            |&(rgb, x)| (rgb, (x - c).length())).collect();
-//        let t : f64 = colors.iter().map(|&(_,t)| t).sum();
-//
-//        let r : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.0 as f64 / t).sum();
-//        let g : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.1 as f64 / t).sum();
-//        let b : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.2 as f64 / t).sum();
-//
-//        RGB(r as u8, g as u8, b as u8)
-          RGB(0x33, 0x33, 0x33)
-    }
-
     pub fn render(&mut self, scene: &World) {
         let origin = Vector3(self.width  as f64 / 2.0,
                              self.height as f64 / 2.0,
@@ -286,9 +270,8 @@ impl Canvas {
                                                      dir,
                                                      &s);
                 if let Some((p, c, d)) = closest {
-                    self.pixels[b as usize][a as usize] =
-                        Canvas::pixel_color(&p, c);
-                    self.zbuffer[b as usize][a as usize] = d
+                    self.pixels[b as usize][a as usize] = p.color_at(c);
+                    self.zbuffer[b as usize][a as usize] = d;
                 }
             }
         }
