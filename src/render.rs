@@ -67,7 +67,7 @@ impl Canvas {
     lights: &Vec<Vector3<f64>>, normal: Vector3<f64>) -> f64 {
         lights.iter().map(
             |&x| {
-                let dir = (x - point);
+                let dir = x - point;
                 let mut ndir = dir;
                 ndir.2 = ndir.2 * 200.0;
                 if let Some((_, _, d)) = Canvas::closest_polygon(
@@ -83,16 +83,25 @@ impl Canvas {
             }).sum()
     }
 
-    fn get_pixel_color(origin: Vector3<f64>, direction: Vector3<f64>,
+    fn reflect(direction: Vector3<f64>, normal: Vector3<f64>) ->
+    Vector3<f64> {
+        direction - normal * 2.0 * direction.dot(normal)
+    }
+
+    fn get_pixel_color(depth: u8, origin: Vector3<f64>, direction: Vector3<f64>,
         polys: &Vec<Polygon>, lights: &Vec<Vector3<f64>>) -> RGB {
+            if depth == 7 {
+                return RGB(0, 0, 0)
+            }
             let closest = Canvas::closest_polygon(origin.into_inner(),
                                                  direction,
                                                  polys);
             if let Some((p, c, _)) = closest {
+                let norm = p.normal();
                 let color = p.color_at(c);
                 let mut lamb = Canvas::lambert_contribution(c, polys,
-                     lights, p.normal());
-                match color {
+                     lights, norm);
+                let color_with_lamb = match color {
                     RGB(r, g, b) => {
                         let mut v = Vector3(r as f64, g as f64, b as f64)
                             * lamb;
@@ -109,7 +118,24 @@ impl Canvas {
                         }
                         RGB(v.0 as u8, v.1 as u8, v.2 as u8)
                     }
-                }
+                };
+
+                let refl_dir = Canvas::reflect(direction, norm);
+                let refl_color = Canvas::get_pixel_color(
+                    depth + 1, c + refl_dir * 0.01, refl_dir,
+                    polys, lights);
+
+                let color_with_refl = if refl_color.0 > 0 || refl_color.1 > 0 ||
+                refl_color.2 > 0 {
+                    match (color_with_lamb, refl_color) {
+                        (RGB(r1, g1, b1), RGB(r2, g2, b2)) => {
+                            RGB(r1 + r2 / 4, g1 + g2 / 4, b1 + b2 / 4)
+                        }
+                    }
+                } else {
+                    color_with_lamb
+                };
+                color_with_refl
             } else {
                 RGB(0x00, 0x00, 0x00)
             }
@@ -127,7 +153,7 @@ impl Canvas {
                     (b as f64 - self.height as f64 / 2.0),
                     1.0);
                 self.pixels[b as usize][a as usize] =
-                    Canvas::get_pixel_color(origin, dir, &poly,
+                    Canvas::get_pixel_color(0, origin, dir, &poly,
                                            &scene.lighting);
             }
         }

@@ -113,8 +113,57 @@ pub fn scene() -> World {
             color: ColorGenerator::Uniform(RGB(0x00, 0x40, 0x30))
         }
     };
+    let cube3 = Shape {
+        primitive : Primitive::TriangleList,
+        verts: vec!(
+            Vector3(450.0,  50.1, 0.40),
+            Vector3(450.0,  50.1, 0.41),
+            Vector3(460.0,  50.1, 0.40),
+            Vector3(450.0,  50.1, 0.41),
+            Vector3(460.0,  50.1, 0.40),
+            Vector3(460.0,  50.1, 0.41),
+
+            Vector3(460.0,  50.1, 0.40),
+            Vector3(460.0,  70.1, 0.40),
+            Vector3(460.0,  50.1, 0.41),
+            Vector3(460.0,  70.1, 0.40),
+            Vector3(460.0,  50.1, 0.41),
+            Vector3(460.0,  70.1, 0.41),
+
+            Vector3(450.0,  70.1, 0.40),
+            Vector3(450.0,  70.1, 0.41),
+            Vector3(460.0,  70.1, 0.40),
+            Vector3(450.0,  70.1, 0.41),
+            Vector3(460.0,  70.1, 0.40),
+            Vector3(460.0,  70.1, 0.41),
+
+            Vector3(450.0,  50.1, 0.40),
+            Vector3(450.0,  70.1, 0.40),
+            Vector3(450.0,  50.1, 0.41),
+            Vector3(450.0,  70.1, 0.40),
+            Vector3(450.0,  50.1, 0.41),
+            Vector3(450.0,  70.1, 0.41),
+
+            Vector3(450.0,  50.1, 0.40),
+            Vector3(450.0,  70.1, 0.40),
+            Vector3(460.0,  50.1, 0.40),
+            Vector3(450.0,  70.1, 0.40),
+            Vector3(460.0,  50.1, 0.40),
+            Vector3(460.0,  70.1, 0.40),
+
+            Vector3(450.0,  50.1, 0.41),
+            Vector3(450.0,  70.1, 0.41),
+            Vector3(460.0,  50.1, 0.41),
+            Vector3(450.0,  70.1, 0.41),
+            Vector3(460.0,  50.1, 0.41),
+            Vector3(460.0,  70.1, 0.41),
+        ),
+        material: Material {
+            color: ColorGenerator::Uniform(RGB(0x78, 0x00, 0x30))
+        }
+    };
     World {
-        shapes: vec!(floor, cube1, cube2),
+        shapes: vec!(floor, cube1, cube2, cube3),
         lighting: vec!(light1, light2)
     }
 }
