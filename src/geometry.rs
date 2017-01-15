@@ -91,10 +91,11 @@ impl Vector3<f64> {
         (self.0 * self.0 + self.1 * self.1 + self.2 * self.2).sqrt()
     }
 
-    pub fn normalize<'b>(&'b mut self) -> &'b mut Self {
+    pub fn normalize<'b>(&self) -> Self {
         let len = self.length();
-        self.0 = self.0 / len; self.1 = self.1 / len; self.2 = self.2 / len;
-        self
+        let mut v = *self;
+        v.0 = v.0 / len; v.1 = v.1 / len; v.2 = v.2 / len;
+        v
     }
 }
 
@@ -152,7 +153,7 @@ impl Polygon {
         let v0v1 = v1 - v0;
         let v0v2 = v2 - v0;
         let mut poly_normal = v0v1 * v0v2;
-        *poly_normal.normalize()
+        poly_normal.normalize()
     }
 }
 

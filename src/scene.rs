@@ -1,7 +1,8 @@
 use geometry::*;
 
 pub fn scene() -> World {
-    let light = Vector3(2.0, 2.0, 2.0);
+    let light1 = Vector3(0.0, 200.0, 1.0);
+    let light2 = Vector3(500.0, 200.0, 0.0);
     let floor = Shape {
         primitive : Primitive::TriangleStrip,
         verts: vec!(
@@ -11,7 +12,7 @@ pub fn scene() -> World {
             Vector3(600.0, 50.0, 0.1),
         ),
         material: Material {
-            color: ColorGenerator::Uniform(RGB(0x66, 0xFF, 0x30)),
+            color: ColorGenerator::Uniform(RGB(0x20, 0xA0, 0x30)),
         }
     };
     let cube1 = Shape {
@@ -60,10 +61,7 @@ pub fn scene() -> World {
             Vector3(250.0, 150.1, 0.8),
         ),
         material: Material {
-            color: ColorGenerator::Linear(
-                RGB(0x66, 0x32, 0x00),
-                RGB(0x34, 0x00, 0x22),
-                RGB(0xFF, 0x66, 0x00))
+            color: ColorGenerator::Uniform(RGB(0x15, 0x00, 0x30))
         }
     };
     let cube2 = Shape {
@@ -112,14 +110,11 @@ pub fn scene() -> World {
             Vector3(550.0, 400.1, 0.8),
         ),
         material: Material {
-            color: ColorGenerator::Linear(
-                RGB(0x00, 0xFF, 0x00),
-                RGB(0xFF, 0x00, 0xFF),
-                RGB(0xFF, 0x00, 0xFF))
+            color: ColorGenerator::Uniform(RGB(0x00, 0x40, 0x30))
         }
     };
     World {
         shapes: vec!(floor, cube1, cube2),
-        lighting: vec!(light)
+        lighting: vec!(light1, light2)
     }
 }

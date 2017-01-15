@@ -67,12 +67,18 @@ impl Canvas {
     lights: &Vec<Vector3<f64>>, normal: Vector3<f64>) -> f64 {
         lights.iter().map(
             |&x| {
-                let dir = *(x - point).normalize();
-                if let Some(_) = Canvas::closest_polygon(
-                    point + dir * 1e-6, dir, polys) {
-                        0.0
+                let dir = (x - point);
+                let mut ndir = dir;
+                ndir.2 = ndir.2 * 200.0;
+                if let Some((_, _, d)) = Canvas::closest_polygon(
+                    point + dir * 0.001, dir, polys) {
+                        if d < dir.length() {
+                            0.0
+                        } else {
+                            ndir.normalize().dot(normal).abs()
+                        }
                     } else {
-                        dir.dot(normal)
+                        ndir.normalize().dot(normal).abs()
                     }
             }).sum()
     }
@@ -83,7 +89,27 @@ impl Canvas {
                                                  direction,
                                                  polys);
             if let Some((p, c, _)) = closest {
-                p.color_at(c)
+                let color = p.color_at(c);
+                let mut lamb = Canvas::lambert_contribution(c, polys,
+                     lights, p.normal());
+                match color {
+                    RGB(r, g, b) => {
+                        let mut v = Vector3(r as f64, g as f64, b as f64)
+                            * lamb;
+                        if v.0 > 255.0 || v.1 > 255.0 || v.2 > 255.0 {
+                            match v {
+                                Vector3(r, g, b) => {
+                                    let max = [r, g, b].iter().map(
+                                        |&x| x as i32).max().unwrap();
+                                    v.0 = v.0 * 254.9 / max as f64;
+                                    v.1 = v.1 * 254.9 / max as f64;
+                                    v.2 = v.2 * 254.9 / max as f64;
+                                }
+                            }
+                        }
+                        RGB(v.0 as u8, v.1 as u8, v.2 as u8)
+                    }
+                }
             } else {
                 RGB(0x00, 0x00, 0x00)
             }
