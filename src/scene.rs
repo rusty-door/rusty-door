@@ -133,7 +133,6 @@ pub fn scene() -> World {
         ),
         material: Material {
             color: ColorGenerator::Uniform(RGB(0x00, 0x40, 0x30))
-
         }
     };
     let cube3 = Shape {
@@ -185,8 +184,57 @@ pub fn scene() -> World {
             color: ColorGenerator::Uniform(RGB(0x78, 0x00, 0x30))
         }
     };
+    let cube4 = Shape {
+        primitive : Primitive::TriangleList,
+        verts: vec!(
+            Vector3(360.0,  50.1, 1.0),
+            Vector3(360.0,  50.1, 1.3),
+            Vector3(460.0,  50.1, 1.0),
+            Vector3(360.0,  50.1, 1.3),
+            Vector3(460.0,  50.1, 1.0),
+            Vector3(460.0,  50.1, 1.3),
+
+            Vector3(460.0,  50.1, 1.0),
+            Vector3(460.0, 150.1, 1.0),
+            Vector3(460.0,  50.1, 1.3),
+            Vector3(460.0, 150.1, 1.0),
+            Vector3(460.0,  50.1, 1.3),
+            Vector3(460.0, 150.1, 1.3),
+
+            Vector3(360.0, 150.1, 1.0),
+            Vector3(360.0, 150.1, 1.3),
+            Vector3(460.0, 150.1, 1.0),
+            Vector3(360.0, 150.1, 1.3),
+            Vector3(460.0, 150.1, 1.0),
+            Vector3(460.0, 150.1, 1.3),
+
+            Vector3(360.0,  50.1, 1.0),
+            Vector3(360.0, 150.1, 1.0),
+            Vector3(360.0,  50.1, 1.3),
+            Vector3(360.0, 150.1, 1.0),
+            Vector3(360.0,  50.1, 1.3),
+            Vector3(360.0, 150.1, 1.3),
+
+            Vector3(360.0,  50.1, 1.0),
+            Vector3(360.0, 150.1, 1.0),
+            Vector3(460.0,  50.1, 1.0),
+            Vector3(360.0, 150.1, 1.0),
+            Vector3(460.0,  50.1, 1.0),
+            Vector3(460.0, 150.1, 1.0),
+
+            Vector3(360.0,  50.1, 1.3),
+            Vector3(360.0, 150.1, 1.3),
+            Vector3(460.0,  50.1, 1.3),
+            Vector3(360.0, 150.1, 1.3),
+            Vector3(460.0,  50.1, 1.3),
+            Vector3(460.0, 150.1, 1.3),
+        ),
+        material: Material {
+            color: ColorGenerator::Uniform(RGB(0x78, 0x00, 0x30))
+        }
+    };
     World {
-        shapes: vec!(floor, cube1, cube2, cube3),
+        shapes: vec!(floor, cube1, cube2, cube3, cube4),
         lighting: vec!(light1, light2)
     }
 }

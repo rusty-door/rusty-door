@@ -101,6 +101,9 @@ impl Canvas {
                 let color = p.color_at(c);
                 let mut lamb = Canvas::lambert_contribution(c, polys,
                      lights, norm);
+                if lamb < 0.1 {
+                    lamb = 0.1
+                }
                 let color_with_lamb = match color {
                     RGB(r, g, b) => {
                         let mut v = Vector3(r as f64, g as f64, b as f64)
