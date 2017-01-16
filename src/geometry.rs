@@ -1,5 +1,7 @@
 use std::ops::{Index,IndexMut,Mul,Sub,Add};
 use std::convert::From;
+use std::f64::consts::PI;
+use std::cmp::min;
 
 #[derive(Clone, Copy, Debug)]
 pub struct RGB (pub u8, pub u8, pub u8);
@@ -110,18 +112,26 @@ pub enum Primitive {
     TriangleStrip
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
+pub struct Texture2d {
+    pub width: u16,
+    pub height: u16,
+    pub values: Vec<RGB>
+}
+
+#[derive(Clone)]
 pub enum ColorGenerator {
     Uniform(RGB),
     Linear(RGB, RGB, RGB),
+    SphereTexture(Vector3<f64>, Texture2d),
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Material {
     pub color: ColorGenerator
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Polygon {
     pub coords: (Vector3<f64>, Vector3<f64>, Vector3<f64>),
     pub material: Material,
@@ -129,9 +139,9 @@ pub struct Polygon {
 
 impl Polygon {
     pub fn color_at(&self, point: Vector3<f64>) -> RGB {
-        match self.material.color {
-            ColorGenerator::Uniform(rgb) => rgb,
-            ColorGenerator::Linear(c1, c2, c3) => {
+        match &self.material.color {
+            &ColorGenerator::Uniform(rgb) => rgb,
+            &ColorGenerator::Linear(c1, c2, c3) => {
                 let dists : Vec<f64> =
                     [self.coords.0, self.coords.1, self.coords.2].
                     iter().map(|&x| (x - point).length()).collect();
@@ -144,6 +154,16 @@ impl Polygon {
                 let b : f64 = colors.iter().map(|&(c, d)| 1.0-d*c.2 as f64 / t).sum();
 
                 RGB(r as u8, g as u8, b as u8)
+            },
+            &ColorGenerator::SphereTexture(center, ref texture) => {
+                let dir = (point - center).normalize();
+                let tu  = dir.0.asin() / PI + 0.5;
+                let tv  = dir.1.asin() / PI + 0.5;
+                let x = min((tu * texture.width as f64) as usize,
+                                    texture.width as usize - 1);
+                let y = min((tv * texture.height as f64) as usize,
+                                    texture.height as usize - 1);
+                texture.values[y * texture.width as usize + x]
             }
         }
     }
@@ -167,7 +187,7 @@ impl Shape {
     pub fn to_polygons(&self) -> Vec<Polygon> {
         let g = |x : &[Vector3<f64>]| Polygon {
             coords : (x[0], x[1], x[2]),
-            material : self.material,
+            material : self.material.clone(),
         };
         match self.primitive {
             Primitive::TriangleList =>  self.verts.chunks (3).map(

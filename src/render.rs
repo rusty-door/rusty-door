@@ -47,8 +47,8 @@ impl Canvas {
             Some((t, p))
         }
 
-    fn closest_polygon(origin: Vector3<f64>, direction: Vector3<f64>,
-          polys: &Vec<Polygon>) -> Option<(Polygon, Vector3<f64>, f64)> {
+    fn closest_polygon<'b>(origin: Vector3<f64>, direction: Vector3<f64>,
+          polys: &'b Vec<Polygon>) -> Option<(&'b Polygon, Vector3<f64>, f64)> {
               let mut min = f64::INFINITY;
               let mut poly = None;
               for p in polys {
@@ -60,7 +60,7 @@ impl Canvas {
                           }
                       }
               }
-              poly.map(|(&p, c)| (p, c, min))
+              poly.map(|(p, c)| (p, c, min))
           }
 
     fn lambert_contribution(point: Vector3<f64>, polys: &Vec<Polygon>,
