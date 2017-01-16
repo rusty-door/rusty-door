@@ -14,7 +14,7 @@ pub enum Dimension {
 }
 
 #[derive(Copy,Clone)]
-pub struct Axis (pub Dimension);
+pub struct Plane (pub Dimension);
 
 #[derive(Copy,Clone,Debug)]
 pub struct Vector3<T> (pub T, pub T, pub T);
@@ -124,6 +124,7 @@ pub enum ColorGenerator {
     Uniform(RGB),
     Linear(RGB, RGB, RGB),
     SphereTexture(Vector3<f64>, Texture2d),
+    PlaneTexture(Vector3<f64>, Vector3<f64>, Plane, Texture2d),
 }
 
 #[derive(Clone)]
@@ -166,6 +167,27 @@ impl Polygon {
                 let y = min((tv * texture.height as f64) as usize,
                                     texture.height as usize - 1);
                 texture.values[y * texture.width as usize + x]
+            },
+            &ColorGenerator::PlaneTexture(start, end, Plane(d), ref tex) => {
+                let g = |p: &Vector3<f64>| match d {
+                    Dimension::X => (p.1, p.2),
+                    Dimension::Y => (p.0, p.2),
+                    Dimension::Z => (p.0, p.1),
+                };
+
+                let (c1, c2) = g(&point);
+                let (s1, s2) = g(&start);
+                let (e1, e2) = g(&end);
+
+                let x = (c1 - s1) / (e1 - s1);
+                let y = (c2 - s2) / (e2 - s2);
+
+                if x >= tex.width as f64 || y >= tex.height as f64 ||
+                x < 0.0 || y < 0.0 {
+                    RGB(0, 0, 0)
+                } else {
+                    tex.values[y as usize * tex.width as usize + x as usize]
+                }
             }
         }
     }
