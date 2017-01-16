@@ -151,13 +151,24 @@ impl Canvas {
         let poly = scene.shapes.iter().flat_map(|x| x.to_polygons()).collect();
         for a in 0..self.width {
             for b in 0..self.height {
-                let dir : Vector3<f64> = Vector3(
+                let dir = Vector3(
                     (a as f64 - self.width  as f64 / 2.0),
                     (b as f64 - self.height as f64 / 2.0),
                     1.0);
-                self.pixels[b as usize][a as usize] =
-                    Canvas::get_pixel_color(0, origin, dir, &poly,
-                                           &scene.lighting);
+                let mods = [(-0.5, 0.5), (0.5, -0.5), (-0.5, -0.5), (0.5, 0.5)];
+                let origs : Vec<Vector3<f64>> = mods.iter().map(
+                    |&(a, b)| Vector3(a, b, 0.0) + origin).collect();
+                let pixels : Vec<RGB> = origs.iter().map(
+                    |&orig| Canvas::get_pixel_color(
+                        0, orig, dir, &poly, &scene.lighting)).collect();
+                let rc : u16 = pixels.iter().map(
+                    |&RGB(a, _, _)| a as u16).sum();
+                let gc : u16 = pixels.iter().map(
+                    |&RGB(_, a, _)| a as u16).sum();
+                let bc : u16 = pixels.iter().map(
+                    |&RGB(_, _, a)| a as u16).sum();
+                self.pixels[b as usize][a as usize] = RGB(
+                    (rc/4) as u8, (gc/4) as u8, (bc/4) as u8);
             }
         }
     }
