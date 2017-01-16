@@ -12,7 +12,29 @@ pub fn scene() -> World {
             Vector3(600.0, 50.0, 0.1),
         ),
         material: Material {
-            color: ColorGenerator::Uniform(RGB(0x20, 0xA0, 0x30)),
+            color: ColorGenerator::SphereTexture(
+                Vector3(350.0, 50.0, 1.45),
+                Texture2d {
+                    width: 4,
+                    height: 4,
+                    values: vec!(
+                        RGB(0x70, 0x40, 0x00),
+                        RGB(0xB0, 0x40, 0x00),
+                        RGB(0x70, 0x40, 0x00),
+                        RGB(0xB0, 0x40, 0x00),
+                        RGB(0x70, 0x40, 0x00),
+                        RGB(0xB0, 0x40, 0x00),
+                        RGB(0x70, 0x40, 0x00),
+                        RGB(0xB0, 0x40, 0x00),
+                        RGB(0x70, 0x40, 0x00),
+                        RGB(0xB0, 0x40, 0x00),
+                        RGB(0x70, 0x40, 0x00),
+                        RGB(0xB0, 0x40, 0x00),
+                        RGB(0x70, 0x40, 0x00),
+                        RGB(0xB0, 0x40, 0x00),
+                        RGB(0x70, 0x40, 0x00),
+                        RGB(0xB0, 0x40, 0x00),
+                        )})
         }
     };
     let cube1 = Shape {
@@ -111,6 +133,7 @@ pub fn scene() -> World {
         ),
         material: Material {
             color: ColorGenerator::Uniform(RGB(0x00, 0x40, 0x30))
+
         }
     };
     let cube3 = Shape {

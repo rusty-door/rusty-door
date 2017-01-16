@@ -156,9 +156,11 @@ impl Polygon {
                 RGB(r as u8, g as u8, b as u8)
             },
             &ColorGenerator::SphereTexture(center, ref texture) => {
-                let dir = (point - center).normalize();
+                let mut dir = point - center;
+                dir.2 = 100.0 * dir.2;
+                let dir = dir.normalize();
                 let tu  = dir.0.asin() / PI + 0.5;
-                let tv  = dir.1.asin() / PI + 0.5;
+                let tv  = dir.2.asin() / PI + 0.5;
                 let x = min((tu * texture.width as f64) as usize,
                                     texture.width as usize - 1);
                 let y = min((tv * texture.height as f64) as usize,
