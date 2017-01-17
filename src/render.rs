@@ -118,9 +118,10 @@ impl Canvas {
         }
 
     pub fn render(&mut self, scene: &World) {
+        let dist = 15.0;
         let origin = Vector3(self.width  as f64 / 2.0,
                              self.height as f64 / 2.0,
-                             -1.0);
+                             -dist);
         let mut poly : Vec<Box<Drawable>> =
             scene.shapes.iter().flat_map(|x| x.to_polygons()).collect();
         for ref s in scene.spheres.iter() {
@@ -132,7 +133,7 @@ impl Canvas {
                 let dir = Vector3(
                     (a as f64 - self.width  as f64 / 2.0),
                     (b as f64 - self.height as f64 / 2.0),
-                    1.0);
+                    dist);
                 let mods = [(-0.5, 0.5), (0.5, -0.5), (-0.5, -0.5), (0.5, 0.5)];
                 let origs : Vec<Vector3<f64>> = mods.iter().map(
                     |&(a, b)| Vector3(a, b, 0.0) + origin).collect();

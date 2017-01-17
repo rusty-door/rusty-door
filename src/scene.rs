@@ -2,7 +2,7 @@ use geometry::*;
 
 pub fn scene() -> World {
     let light1 = Vector3(0.0, 200.0, 1.0);
-    let light2 = Vector3(500.0, 200.0, 0.0);
+    let light2 = Vector3(350.0, 200.0, 0.0);
     let floor = Shape {
         primitive : Primitive::TriangleStrip,
         verts: vec!(
@@ -234,14 +234,14 @@ pub fn scene() -> World {
         }
     };
     let sphere = Ellipsoid {
-        center : Vector3(300.0, 120.0, 0.6),
+        center : Vector3(300.0, 110.0, 0.6),
         radii  : Vector3( 50.0,  60.0, 0.5),
         material: Material {
             color: ColorGenerator::Uniform(RGB(0x99, 0x20, 0x00))
         }
     };
     World {
-        shapes: vec!(floor), // vec!(floor, cube1, cube2, cube3, cube4),
+        shapes: vec!(floor, cube1, cube2, cube3, cube4),
         spheres: vec!(sphere),
         lighting: vec!(light1, light2)
     }
