@@ -20,40 +20,13 @@ impl Canvas {
         &self.pixels
     }
 
-    fn raytrace(origin: Vector3<f64>, direction: Vector3<f64>, poly: &Polygon)->
-        Option<(f64, Vector3<f64>)> {
-            let (v0, v1, v2) = poly.coords;
-            let poly_normal = poly.normal();
-
-            let triangle_ray_dot = poly_normal.dot(direction);
-
-            if triangle_ray_dot.abs() < f64::EPSILON {
-                return None;
-            }
-
-            let t = (poly_normal.dot(v0 - origin))/triangle_ray_dot;
-
-            if t < 0.0 {
-                return None;
-            }
-
-            let p = origin + direction * t;
-
-            if [(v1, v0), (v2, v1), (v0, v2)].iter().any(
-                |&(a, b)| poly_normal.dot((a - b) * (p - b)) < 0.0) {
-                    return None;
-                }
-
-            Some((t, p))
-        }
-
     fn closest_polygon<'b>(origin: Vector3<f64>, direction: Vector3<f64>,
-          polys: &'b Vec<Polygon>) -> Option<(&'b Polygon, Vector3<f64>, f64)> {
+          polys: &'b Vec<Box<Drawable>>)
+          -> Option<(&'b Box<Drawable>, Vector3<f64>, f64)> {
               let mut min = f64::INFINITY;
               let mut poly = None;
               for p in polys {
-                  if let Some((t, c)) = Canvas::raytrace(
-                      origin, direction, p) {
+                  if let Some((t, c)) = p.raytrace(origin, direction) {
                           if t < min {
                               min = t;
                               poly = Some((p, c));
@@ -63,7 +36,7 @@ impl Canvas {
               poly.map(|(p, c)| (p, c, min))
           }
 
-    fn lambert_contribution(point: Vector3<f64>, polys: &Vec<Polygon>,
+    fn lambert_contribution(point: Vector3<f64>, polys: &Vec<Box<Drawable>>,
     lights: &Vec<Vector3<f64>>, normal: Vector3<f64>) -> f64 {
         lights.iter().map(
             |&x| {
@@ -89,7 +62,7 @@ impl Canvas {
     }
 
     fn get_pixel_color(depth: u8, origin: Vector3<f64>, direction: Vector3<f64>,
-        polys: &Vec<Polygon>, lights: &Vec<Vector3<f64>>) -> RGB {
+        polys: &Vec<Box<Drawable>>, lights: &Vec<Vector3<f64>>) -> RGB {
             if depth == 7 {
                 return RGB(0, 0, 0)
             }
@@ -97,7 +70,7 @@ impl Canvas {
                                                  direction,
                                                  polys);
             if let Some((p, c, _)) = closest {
-                let norm = p.normal();
+                let norm = p.normal(c);
                 let color = p.color_at(c);
                 let mut lamb = Canvas::lambert_contribution(c, polys,
                      lights, norm);

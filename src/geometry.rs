@@ -1,6 +1,7 @@
 use std::ops::{Index,IndexMut,Mul,Sub,Add};
 use std::convert::From;
 use std::f64::consts::PI;
+use std::f64;
 use std::cmp::min;
 
 #[derive(Clone, Copy, Debug)]
@@ -132,14 +133,22 @@ pub struct Material {
     pub color: ColorGenerator
 }
 
+pub trait Drawable {
+    fn raytrace(&self, origin: Vector3<f64>, direction: Vector3<f64>) ->
+        Option<(f64, Vector3<f64>)>;
+    fn color_at(&self, point: Vector3<f64>) -> RGB;
+    fn normal(&self, point: Vector3<f64>) -> Vector3<f64>;
+}
+
 #[derive(Clone)]
 pub struct Polygon {
     pub coords: (Vector3<f64>, Vector3<f64>, Vector3<f64>),
     pub material: Material,
 }
 
-impl Polygon {
-    pub fn color_at(&self, point: Vector3<f64>) -> RGB {
+impl Drawable for Polygon {
+
+    fn color_at(&self, point: Vector3<f64>) -> RGB {
         match &self.material.color {
             &ColorGenerator::Uniform(rgb) => rgb,
             &ColorGenerator::Linear(c1, c2, c3) => {
@@ -192,7 +201,34 @@ impl Polygon {
         }
     }
 
-    pub fn normal(&self) -> Vector3<f64> {
+    fn raytrace(&self, origin: Vector3<f64>, direction: Vector3<f64>)->
+        Option<(f64, Vector3<f64>)> {
+            let (v0, v1, v2) = self.coords;
+            let self_normal = self.normal(origin);
+
+            let triangle_ray_dot = self_normal.dot(direction);
+
+            if triangle_ray_dot.abs() < f64::EPSILON {
+                return None;
+            }
+
+            let t = (self_normal.dot(v0 - origin))/triangle_ray_dot;
+
+            if t < 0.0 {
+                return None;
+            }
+
+            let p = origin + direction * t;
+
+            if [(v1, v0), (v2, v1), (v0, v2)].iter().any(
+                |&(a, b)| self_normal.dot((a - b) * (p - b)) < 0.0) {
+                    return None;
+                }
+
+            Some((t, p))
+        }
+
+    fn normal(&self, _: Vector3<f64>) -> Vector3<f64> {
         let (v0, v1, v2) = self.coords;
         let v0v1 = v1 - v0;
         let v0v2 = v2 - v0;
@@ -208,10 +244,12 @@ pub struct Shape {
 }
 
 impl Shape {
-    pub fn to_polygons(&self) -> Vec<Polygon> {
-        let g = |x : &[Vector3<f64>]| Polygon {
-            coords : (x[0], x[1], x[2]),
-            material : self.material.clone(),
+    pub fn to_polygons(&self) -> Vec<Box<Drawable>> {
+        let g = |x : &[Vector3<f64>]| -> Box<Drawable> {
+            Box::new(Polygon {
+                coords : (x[0], x[1], x[2]),
+                material : self.material.clone(),
+            })
         };
         match self.primitive {
             Primitive::TriangleList =>  self.verts.chunks (3).map(
