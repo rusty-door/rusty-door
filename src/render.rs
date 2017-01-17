@@ -121,7 +121,12 @@ impl Canvas {
         let origin = Vector3(self.width  as f64 / 2.0,
                              self.height as f64 / 2.0,
                              -1.0);
-        let poly = scene.shapes.iter().flat_map(|x| x.to_polygons()).collect();
+        let mut poly : Vec<Box<Drawable>> =
+            scene.shapes.iter().flat_map(|x| x.to_polygons()).collect();
+        for ref s in scene.spheres.iter() {
+            let c : Box<Drawable> = Box::new((*s).clone());
+            poly.push(c);
+        }
         for a in 0..self.width {
             for b in 0..self.height {
                 let dir = Vector3(

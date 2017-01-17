@@ -82,6 +82,12 @@ impl<T: Sub<T, Output=T>> Sub<Vector3<T>> for Vector3<T> {
     }
 }
 
+impl<T: Mul<T, Output=T> + Copy> Vector3<T> {
+    pub fn comp_mul(&self, rhs: Vector3<T>) -> Vector3<T> {
+        Vector3(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2)
+    }
+}
+
 impl<T: Mul<T, Output=T> + Add<T, Output=T> + Copy> Vector3<T> {
     pub fn dot(&self, rhs: Vector3<T>) -> T {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
@@ -225,7 +231,7 @@ impl Drawable for Polygon {
                     return None;
                 }
 
-            Some((t, p))
+            Some((t * direction.length(), p))
         }
 
     fn normal(&self, _: Vector3<f64>) -> Vector3<f64> {
@@ -234,6 +240,93 @@ impl Drawable for Polygon {
         let v0v2 = v2 - v0;
         let mut poly_normal = v0v1 * v0v2;
         poly_normal.normalize()
+    }
+}
+
+#[derive(Clone)]
+pub struct Ellipsoid {
+    pub center   : Vector3<f64>,
+    pub radii    : Vector3<f64>,
+    pub material : Material
+}
+
+impl Drawable for Ellipsoid {
+
+    fn color_at(&self, point: Vector3<f64>) -> RGB {
+        match &self.material.color {
+            &ColorGenerator::Uniform(rgb) => rgb,
+            &ColorGenerator::Linear(c1, c2, c3) => c1,
+            &ColorGenerator::SphereTexture(center, ref texture) => {
+                let mut dir = point - center;
+                dir.2 = 100.0 * dir.2;
+                let dir = dir.normalize();
+                let tu  = dir.0.asin() / PI + 0.5;
+                let tv  = dir.2.asin() / PI + 0.5;
+                let x = min((tu * texture.width as f64) as usize,
+                                    texture.width as usize - 1);
+                let y = min((tv * texture.height as f64) as usize,
+                                    texture.height as usize - 1);
+                texture.values[y * texture.width as usize + x]
+            },
+            &ColorGenerator::PlaneTexture(start, end, Plane(d), ref tex) => {
+                let g = |p: &Vector3<f64>| match d {
+                    Dimension::X => (p.1, p.2),
+                    Dimension::Y => (p.0, p.2),
+                    Dimension::Z => (p.0, p.1),
+                };
+
+                let (c1, c2) = g(&point);
+                let (s1, s2) = g(&start);
+                let (e1, e2) = g(&end);
+
+                let x = (c1 - s1) / (e1 - s1);
+                let y = (c2 - s2) / (e2 - s2);
+
+                if x >= tex.width as f64 || y >= tex.height as f64 ||
+                x < 0.0 || y < 0.0 {
+                    RGB(0, 0, 0)
+                } else {
+                    tex.values[y as usize * tex.width as usize + x as usize]
+                }
+            }
+        }
+    }
+
+    fn raytrace(&self, origin: Vector3<f64>, direction: Vector3<f64>)->
+        Option<(f64, Vector3<f64>)> {
+            let ray_intersects_sphere = |
+            c : Vector3<f64>,
+            r : f64,
+            o : Vector3<f64>,
+            d : Vector3<f64>| -> Option<Vector3<f64>> {
+                let orig_to_center = c - o;
+                let v = d.normalize().dot(orig_to_center);
+                let disc = r * r - orig_to_center.dot(orig_to_center) + v * v;
+                if disc < 0.0 {
+                    None
+                } else {
+                    let dist = v - disc.sqrt();
+                    if dist < 0.0 {
+                        None
+                    } else {
+                        Some(o + d * dist)
+                    }
+                }
+            };
+
+            let r = 1.0;
+            let mult = Vector3(r / self.radii.0, r / self.radii.1, r / self.radii.2);
+            let center = (self.center - origin).comp_mul(mult);
+            let dir = direction.comp_mul(mult);
+            let orig = Vector3(0.0, 0.0, 0.0);
+
+            let res = ray_intersects_sphere(center, r, orig, dir);
+            res.map(|x| x.comp_mul(self.radii)).map(
+                |x| (0.0, x + origin))
+        }
+
+    fn normal(&self, p: Vector3<f64>) -> Vector3<f64> {
+        (p - self.center).normalize()
     }
 }
 
@@ -262,6 +355,7 @@ impl Shape {
 
 pub struct World {
     pub shapes: Vec<Shape>,
+    pub spheres: Vec<Ellipsoid>,
     pub lighting: Vec<Vector3<f64>>,
 }
 

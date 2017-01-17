@@ -233,8 +233,16 @@ pub fn scene() -> World {
             color: ColorGenerator::Uniform(RGB(0x78, 0x00, 0x30))
         }
     };
+    let sphere = Ellipsoid {
+        center : Vector3(300.0, 120.0, 0.6),
+        radii  : Vector3( 50.0,  60.0, 0.5),
+        material: Material {
+            color: ColorGenerator::Uniform(RGB(0x99, 0x20, 0x00))
+        }
+    };
     World {
-        shapes: vec!(floor, cube1, cube2, cube3, cube4),
+        shapes: vec!(floor), // vec!(floor, cube1, cube2, cube3, cube4),
+        spheres: vec!(sphere),
         lighting: vec!(light1, light2)
     }
 }
