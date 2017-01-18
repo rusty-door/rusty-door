@@ -299,8 +299,9 @@ impl Drawable for Ellipsoid {
             r : f64,
             o : Vector3<f64>,
             d : Vector3<f64>| -> Option<Vector3<f64>> {
+                let d = d.normalize();
                 let orig_to_center = c - o;
-                let v = d.normalize().dot(orig_to_center);
+                let v = d.dot(orig_to_center);
                 let disc = r * r - orig_to_center.dot(orig_to_center) + v * v;
                 if disc < 0.0 {
                     None
@@ -326,7 +327,9 @@ impl Drawable for Ellipsoid {
         }
 
     fn normal(&self, p: Vector3<f64>) -> Vector3<f64> {
-        (p - self.center).normalize()
+        let mut p = p - self.center;
+        p.2 = p.2 * 200.0;
+        p.normalize()
     }
 }
 

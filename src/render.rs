@@ -118,7 +118,7 @@ impl Canvas {
         }
 
     pub fn render(&mut self, scene: &World) {
-        let dist = 15.0;
+        let dist = 1.0;
         let origin = Vector3(self.width  as f64 / 2.0,
                              self.height as f64 / 2.0,
                              -dist);
